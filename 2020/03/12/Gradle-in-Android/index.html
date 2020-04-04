@@ -1,0 +1,191 @@
+
+
+
+<!DOCTYPE html>
+<html lang="en,zh-CN,ja,default">
+<head>
+  <meta charset="UTF-8">
+  <title>Gradle in Android [ hiaoyun-en ]</title>
+  
+  
+    <!-- stylesheets list from _config.yml -->
+    
+      <!-- 引入 CSS -->
+      <link rel="stylesheet" href="/css/noise.css">
+    
+      <!-- 引入 CSS -->
+      <link rel="stylesheet" href="/lib/fontawesome-free-5.11.2-web/css/all.css">
+    
+      <!-- 引入 CSS -->
+      <link rel="stylesheet" href="/lib/highlight/styles/atom-one-dark.css">
+    
+  
+<meta name="generator" content="Hexo 4.2.0"></head>
+<body>
+
+<!-- 引入导航菜单 -->
+ 
+<!-- 导航菜单 -->
+<div id="menu-outer">
+    <div id="menu-inner">
+        
+        <span id="menu-link-icon">
+            <a href="/">Home</a>
+        </span>
+        
+        <span id="menu-link-icon">
+            <a href="/archives">Archives</a>
+        </span>
+        
+        <span id="menu-link-icon">
+            <a href="/about">About</a>
+        </span>
+        
+    </div>
+</div>
+ 
+
+<div id="content-outer">
+  <div id="content-inner">
+     
+<article id="post">
+  <h1>Gradle in Android</h1>
+  <p>Android 构建时会编译源代码和应用资源，然后打包为APK文件。Android Studio 使用 Gradle 来自动执行和管理构建流程。Android Plugin for Gradle 与 Gradle 搭配使用，专门为 Android 应用的构建提供支持。</p>
+<a id="more"></a>
+
+<h2 id="构建流程"><a href="#构建流程" class="headerlink" title="构建流程"></a>构建流程</h2><p><img src="https://developer.android.google.cn/images/tools/studio/build-process_2x.png?hl=zh-cn" alt=""></p>
+<p>由 Gradle 和 Android Plugin 管理，编译器将应用模块（包括源代码、资源文件、AIDL文件）和依赖项（包括库模块、AAR库、JAR库）编译成DEX文件和编译后的资源。然后由APK打包器和签名文件一起打包出APK。</p>
+<h2 id="自定义版本配置"><a href="#自定义版本配置" class="headerlink" title="自定义版本配置"></a>自定义版本配置</h2><h3 id="依赖项"><a href="#依赖项" class="headerlink" title="依赖项"></a>依赖项</h3><h4 id="依赖项类型"><a href="#依赖项类型" class="headerlink" title="依赖项类型"></a>依赖项类型</h4><p>依赖项有以下3中依赖类型：</p>
+<pre><code class="groovy">// 本地库模块    
+implementation project(&quot;:mylibrary&quot;)
+// 本地二进制文件
+implementation fileTree(dir: &#39;libs&#39;, include: [&#39;*.jar&#39;])
+implementation files(&#39;libs/foo.jar&#39;, &#39;libs/bar.jar&#39;)
+// 远程二进制文件
+implementation &#39;me.aoyun.android:app-magic:12.3&#39;
+// implementation group: &#39;com.example.android&#39;, name: &#39;app-magic&#39;, version: &#39;12.3&#39;</code></pre>
+<h4 id="依赖项配置"><a href="#依赖项配置" class="headerlink" title="依赖项配置"></a>依赖项配置</h4><p>依赖项配置向 Gradle 提供了如何使用依赖项的说明。</p>
+<table>
+<thead>
+<tr>
+<th>新配置</th>
+<th>已弃用配置</th>
+<th>行为</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>implementation</td>
+<td>compile</td>
+<td>Gradle 会将依赖项添加到编译类路径，将依赖项打包到构建输出。同时表示在<strong>编译</strong>时，只有该<code>module</code>可以使用该依赖，其它<code>module</code>只有在运行时才能使用。</td>
+</tr>
+<tr>
+<td>api</td>
+<td>compile</td>
+<td>Gradle 会将依赖项添加到编译路径和构建输出。与 implementation 不同的是，api依赖所有<code>module</code>在编译时和运行时都可使用。</td>
+</tr>
+<tr>
+<td>annotationProcessor</td>
+<td>compile</td>
+<td>依赖项作为注解处理器的库。</td>
+</tr>
+</tbody></table>
+<h4 id="查看模块依赖项"><a href="#查看模块依赖项" class="headerlink" title="查看模块依赖项"></a>查看模块依赖项</h4><p> 一些直接依赖项可能具有自己的依赖项。此类依赖项称为“传递依赖项”。 </p>
+<p>  Android Plugin for Gradle 提供了一项<code>task</code>，用来列出 Gradle 为给定模块解析的依赖项。 </p>
+<p><img src="https://i.loli.net/2020/03/12/z57TI83vyXiRFw6.png" alt="image.png"></p>
+<h2 id="版本配置文件"><a href="#版本配置文件" class="headerlink" title="版本配置文件"></a>版本配置文件</h2><p><img src="https://i.loli.net/2020/03/12/LrNik7FWo8HjXms.png" alt="image-20200312105420997.png"></p>
+<p>版本配置文件即<code>build.gradle</code>文件。这些文件使用的是 DSL （Domain Specific Language 领域特定语言）以 Groovy 来编写。Android Plugin for Gradle 中引入了大多数需要的 DSL 元素。</p>
+<h3 id="Gradle-设置文件"><a href="#Gradle-设置文件" class="headerlink" title="Gradle 设置文件"></a>Gradle 设置文件</h3><p><code>setting.gradle</code>文件用于指示构建<code>build</code>时包括哪些<code>module</code>。</p>
+<h3 id="顶层版本文件"><a href="#顶层版本文件" class="headerlink" title="顶层版本文件"></a>顶层版本文件</h3><p><code>Project</code> 的<code>build.gradle</code>，用于定义项目中所有模块的配置。</p>
+<h4 id="配置项目全局属性"><a href="#配置项目全局属性" class="headerlink" title="配置项目全局属性"></a>配置项目全局属性</h4><p>多模块项目时，有可能需要在不同模块之间共享相同属性，此时就可以把这些属性写在<code>Project</code>的<code>build.gradle</code>的<code>ext</code>代码块中：</p>
+<pre><code class="groovy">ext {
+    compileSdkVersion = 28
+    supportLibVersion = &quot;28.0.0&quot;
+}</code></pre>
+<p>在模块<code>module</code>中的<code>build.gradle</code> 中使用：</p>
+<pre><code class="groovy">android {
+    compileSdkVersion rootProject.ext.compileSdkVersion
+}
+dependencies {
+    implementation &quot;com.android.support:appcompat-v7:${rootProject.ext.supportLibVersion}&quot;
+}</code></pre>
+<h3 id="模块版本文件"><a href="#模块版本文件" class="headerlink" title="模块版本文件"></a>模块版本文件</h3><pre><code class="groovy">// 应用 Android Plugin for Gradle，以便使用一些变量
+apply plugin: &#39;com.android.application&#39;
+
+// 指定 build 选项
+android {
+    compileSdkVersion 29
+    buildToolsVersion &quot;29.0.2&quot;
+    defaultConfig {
+        applicationId &quot;me.aoyun.ljetpack&quot;
+        minSdkVersion 19
+        targetSdkVersion 29
+        versionCode 1
+        versionName &quot;1.0&quot;
+        testInstrumentationRunner &quot;androidx.test.runner.AndroidJUnitRunner&quot;
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile(&#39;proguard-android-optimize.txt&#39;), &#39;proguard-rules.pro&#39;
+        }
+    }
+    // 启用DataBinding
+    dataBinding {
+        enabled true
+    }
+}
+
+// 指定本module中的依赖
+dependencies {
+    implementation fileTree(dir: &#39;libs&#39;, include: [&#39;*.jar&#39;])
+    implementation &#39;androidx.appcompat:appcompat:1.0.2&#39;
+    implementation &#39;androidx.constraintlayout:constraintlayout:1.1.3&#39;
+    testImplementation &#39;junit:junit:4.12&#39;
+    androidTestImplementation &#39;androidx.test:runner:1.1.1&#39;
+    androidTestImplementation &#39;androidx.test.espresso:espresso-core:3.1.1&#39;
+}</code></pre>
+<h3 id="Gradle-属性文件"><a href="#Gradle-属性文件" class="headerlink" title="Gradle 属性文件"></a>Gradle 属性文件</h3><p><code>gradle.properties</code> 配置项目全局Gradle设置</p>
+<p><code>local.properties</code> 配置构建系统的本地环境</p>
+<h2 id="Gradle同步"><a href="#Gradle同步" class="headerlink" title="Gradle同步"></a>Gradle同步</h2><p>每当 Gradle 文件有改变时，会要求<code>sync now</code>，点击即可立即同步。</p>
+<p>或者也可以点击</p>
+<p><img src="https://i.loli.net/2020/03/12/1Go6WFx9gDCsI8T.png" alt="image-20200312113311347.png"></p>
+<p>进行同步。</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://developer.android.google.cn/studio/build?hl=zh-cn" target="_blank" rel="noopener">配置您的版本</a></p>
+<p><a href="https://developer.android.google.cn/studio/build/dependencies?hl=zh-cn" target="_blank" rel="noopener">添加构建依赖项</a></p>
+<p>待</p>
+<p>2020-3-12 11:52:14</p>
+
+</article>
+
+<div id="paginator">
+  
+</div>
+
+  </div>
+</div>
+
+<div id="bottom-outer">
+    <div id="bottom-inner">
+        Site by Aoyun using
+        <a href="http://hexo.io" target="_blank" rel="noopener">hexo blog framework</a>.
+        <br>
+        <a href="/">Home</a>
+    </div>
+</div> 
+<button class="back-to-top">↑</button>
+
+<!-- 引入 JS -->
+<script src="https://ajax.aspnetcdn.com/ajax/jquery/jquery-1.9.0.min.js"></script>
+
+  <!-- scripts list from theme config.yml -->
+  
+    <script src="/js/noise.js"></script>
+  
+    <script src="/lib/highlight/highlight.pack.js"></script>
+  
+
+
+<script>hljs.initHighlightingOnLoad();</script>
+
+</body>
+</html>

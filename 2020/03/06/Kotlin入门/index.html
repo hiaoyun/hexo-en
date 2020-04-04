@@ -1,0 +1,266 @@
+
+
+
+<!DOCTYPE html>
+<html lang="en,zh-CN,ja,default">
+<head>
+  <meta charset="UTF-8">
+  <title>Kotlin入门 [ hiaoyun-en ]</title>
+  
+  
+    <!-- stylesheets list from _config.yml -->
+    
+      <!-- 引入 CSS -->
+      <link rel="stylesheet" href="/css/noise.css">
+    
+      <!-- 引入 CSS -->
+      <link rel="stylesheet" href="/lib/fontawesome-free-5.11.2-web/css/all.css">
+    
+      <!-- 引入 CSS -->
+      <link rel="stylesheet" href="/lib/highlight/styles/atom-one-dark.css">
+    
+  
+<meta name="generator" content="Hexo 4.2.0"></head>
+<body>
+
+<!-- 引入导航菜单 -->
+ 
+<!-- 导航菜单 -->
+<div id="menu-outer">
+    <div id="menu-inner">
+        
+        <span id="menu-link-icon">
+            <a href="/">Home</a>
+        </span>
+        
+        <span id="menu-link-icon">
+            <a href="/archives">Archives</a>
+        </span>
+        
+        <span id="menu-link-icon">
+            <a href="/about">About</a>
+        </span>
+        
+    </div>
+</div>
+ 
+
+<div id="content-outer">
+  <div id="content-inner">
+     
+<article id="post">
+  <h1>Kotlin入门</h1>
+  <h1 id="关键词语"><a href="#关键词语" class="headerlink" title="关键词语"></a>关键词语</h1><p><code>var</code>  <code>val</code></p>
+<p><code>fun</code></p>
+<p><code>a:Int</code></p>
+<p><code>open</code> <code>override</code></p>
+<p><code>constructor</code></p>
+<a id="more"></a>
+
+<h1 id="Basic-Syntax"><a href="#Basic-Syntax" class="headerlink" title="Basic Syntax"></a>Basic Syntax</h1><h2 id="Defining-packages"><a href="#Defining-packages" class="headerlink" title="Defining packages"></a>Defining packages</h2><pre><code class="kotlin">package my.demo
+
+import java.util.*
+// as java</code></pre>
+<h2 id="Defining-functions"><a href="#Defining-functions" class="headerlink" title="Defining functions"></a>Defining functions</h2><pre><code class="kotlin">fun sum(a: Int, b: Int): Int {
+    return a + b
+}</code></pre>
+<pre><code class="kotlin">fun sum(a: Int, b: Int) = a + b
+// inferred return type</code></pre>
+<pre><code class="kotlin">fun printSum(a: Int, b: Int): Unit {
+    println(&quot;sum of $a and $b is ${a + b}&quot;)
+}
+// return no meaningful value
+
+fun printSum(a: Int, b: Int) {
+    println(&quot;sum of $a and $b is ${a + b}&quot;)
+}
+// Unit can be omitted</code></pre>
+<h2 id="Defining-variables"><a href="#Defining-variables" class="headerlink" title="Defining variables"></a>Defining variables</h2><pre><code class="kotlin">val a: Int = 1
+val b = 2 // type can be inferred
+
+val c: Int
+c = 3
+// read-only local variables are defined using val </code></pre>
+<pre><code class="kotlin">var x = 5 // Int type is inferred
+x += 1
+// variables can be reassigned use var</code></pre>
+<h2 id="Comments"><a href="#Comments" class="headerlink" title="Comments"></a>Comments</h2><pre><code class="kotlin">// 
+
+/*
+    */
+
+/*
+    /*
+        */
+            */
+// block comments can be nested</code></pre>
+<h2 id="Using-string-templates"><a href="#Using-string-templates" class="headerlink" title="Using string templates"></a>Using string templates</h2><pre><code class="kotlin">var a = 1
+val s1 = &quot;a is $a&quot;
+
+a = 2
+val s2 = &quot;${s1.replace(&quot;is&quot;, &quot;was&quot;)}, but now is $a&quot;
+// { }</code></pre>
+<h2 id="Using-conditional-expressions"><a href="#Using-conditional-expressions" class="headerlink" title="Using conditional expressions"></a>Using conditional expressions</h2><pre><code class="kotlin">fun maxOf(a: Int, b: Int): Int {
+    if (a &gt; b) {
+        return a
+    } else {
+        return b
+    }
+}</code></pre>
+<pre><code class="kotlin">fun maxOf(a: Int, b: Int) = if (a &gt; b) a else b</code></pre>
+<h2 id="Using-nullable-values-and-checking-for-null"><a href="#Using-nullable-values-and-checking-for-null" class="headerlink" title="Using nullable values and checking for null"></a>Using nullable values and checking for null</h2><pre><code class="kotlin">fun parseInt(str: String): Int? { 
+    // return null if str is not a integer
+    return str.toIntOrNull()
+}
+// Int?
+
+fun printProduct(arg1: String, arg2: String) {
+    val x = parseInt(arg1)
+    val y = parseInt(arg2)
+
+    //! x * y 
+    // Error: x y might be null
+
+    if (x != null &amp;&amp; y != null) {
+        // x y automatically cast to non-nullable after null check
+        println(x * y);
+    }
+    else {
+        println(&quot;either &#39;$arg1&#39; or &#39;$arg2 is not a number&quot; )
+    }
+}</code></pre>
+<pre><code class="kotlin">fun printProduct(arg1: String, arg2: String) {
+// ...
+    if (x != null &amp;&amp; y != null) {
+        // x y automatically cast to non-nullable after null check
+        println(x * y);
+    }
+// ...</code></pre>
+<h2 id="Using-type-checks-and-automatic-casts"><a href="#Using-type-checks-and-automatic-casts" class="headerlink" title="Using type checks and automatic casts"></a>Using type checks and automatic casts</h2><pre><code class="kotlin">fun getStringLength(obj: Any): Int? {
+    if (obj is String) {
+        return obj.length
+    }
+
+       return null
+}</code></pre>
+<pre><code class="kotlin">fun getStringLength(obj: Any): Int? {
+    if (obj !is String) return null
+
+    // `obj` 在这一分支自动转换为 `String`
+    return obj.length
+}</code></pre>
+<pre><code class="kotlin">fun getStringLength(obj: Any): Int? {
+    // `obj` 在 `&amp;&amp;` 右边自动转换成 `String` 类型
+    if (obj is String &amp;&amp; obj.length &gt; 0) {
+      return obj.length
+    }
+
+    return null
+}</code></pre>
+<h2 id="Using-a-for-loop"><a href="#Using-a-for-loop" class="headerlink" title="Using a for loop"></a>Using a for loop</h2><pre><code class="kotlin">var items = listOf(&quot;apple&quot;, &quot;banana&quot;, &quot;kiwifruit&quot;)
+for (item in items) {
+    println(item)
+}</code></pre>
+<pre><code class="kotlin">var items = listOf(&quot;apple&quot;, &quot;banana&quot;, &quot;kiwifruit&quot;)
+for (index in items.indices) {
+    println(items[index])
+}</code></pre>
+<h2 id="Using-a-while-loop"><a href="#Using-a-while-loop" class="headerlink" title="Using a while loop"></a>Using a while loop</h2><pre><code class="kotlin">var items = listOf(&quot;apple&quot;, &quot;banana&quot;, &quot;kiwifruit&quot;)
+var index = 0
+while (index &lt; items.size) {
+    println(items[index])
+    index++
+}</code></pre>
+<h2 id="Using-when-expression"><a href="#Using-when-expression" class="headerlink" title="Using when expression"></a>Using when expression</h2><pre><code class="kotlin">fun describe(obj: Any): String =
+    when(obj) {
+        1 -&gt; &quot;One&quot;
+        &quot;Hello&quot; -&gt; &quot;Greeting&quot;
+        is Long -&gt; &quot;Long&quot;
+        !is String -&gt; &quot;Not a string&quot;
+           in 1..10 -&gt; print(&quot;obj is in the range&quot;)
+        // else is required
+        else -&gt; &quot;Unknown&quot; 
+    }</code></pre>
+<h2 id="Using-ranges"><a href="#Using-ranges" class="headerlink" title="Using ranges"></a>Using ranges</h2><pre><code class="kotlin">val x = 10
+val y = 9
+if (x in 1..y+1) {
+    println(&quot;fits in range&quot;)
+}</code></pre>
+<pre><code class="kotlin">val list = listOf(&quot;a&quot;, &quot;b&quot;, &quot;c&quot;)
+
+if (-1 !in 0..list.lastIndex) {
+    println(&quot;-1 is out of range&quot;)
+}
+if (list.size !in list.indices) {
+    println(&quot;list size is out of valid list indices range, too&quot;)
+}</code></pre>
+<pre><code class="kotlin">for (x in 1..5) {
+    print(x)
+}</code></pre>
+<pre><code class="kotlin">for (x in 1..10 step 2) {
+    print(x)
+}
+println()
+for (x in 9 downTo 0 step 3) {
+    print(x)
+}
+// step</code></pre>
+<h2 id="Using-collections"><a href="#Using-collections" class="headerlink" title="Using collections"></a>Using collections</h2><pre><code class="kotlin">when {
+    &quot;orange&quot; in items -&gt; println(&quot;juicy&quot;)
+    &quot;apple&quot; in items -&gt; println(&quot;apple is fine too&quot;)
+}</code></pre>
+<h2 id="Creating-basic-classes-and-their-instances"><a href="#Creating-basic-classes-and-their-instances" class="headerlink" title="Creating basic classes and their instances"></a>Creating basic classes and their instances</h2><pre><code class="kotlin">var rectangle = Rectangle(5.0, 2.0)
+var triangle = Triangle(3.0, 4.0, 5.0)
+// new is not required</code></pre>
+<h1 id="数据类"><a href="#数据类" class="headerlink" title="数据类"></a>数据类</h1><pre><code class="kotlin">data class Student (
+    var name : String, 
+    var id : Int)</code></pre>
+<h1 id="一个关键字实现单例"><a href="#一个关键字实现单例" class="headerlink" title="一个关键字实现单例"></a>一个关键字实现单例</h1><pre><code class="kotlin">object Log {
+    fun i(string: String) {
+        println(string)
+    }
+}
+
+fun main(args: Array&lt;String&gt;) {
+    Log.i(&quot;test&quot;)
+}</code></pre>
+<h1 id="use"><a href="#use" class="headerlink" title="use"></a>use</h1><pre><code>inline fun &lt;T : Closeable?, R&gt; T.use(block: (T) -&gt; R): R
+</code></pre><p>Executes the given block function on this resource and then closes it down correctly whether an exception is thrown or not.</p>
+<p>用于实现了<code>Closeable</code>接口的类，执行闭包函数，然后关闭类，不管有没有异常。</p>
+<p>待</p>
+<p>2020-3-6 23:12:57</p>
+
+</article>
+
+<div id="paginator">
+  
+</div>
+
+  </div>
+</div>
+
+<div id="bottom-outer">
+    <div id="bottom-inner">
+        Site by Aoyun using
+        <a href="http://hexo.io" target="_blank" rel="noopener">hexo blog framework</a>.
+        <br>
+        <a href="/">Home</a>
+    </div>
+</div> 
+<button class="back-to-top">↑</button>
+
+<!-- 引入 JS -->
+<script src="https://ajax.aspnetcdn.com/ajax/jquery/jquery-1.9.0.min.js"></script>
+
+  <!-- scripts list from theme config.yml -->
+  
+    <script src="/js/noise.js"></script>
+  
+    <script src="/lib/highlight/highlight.pack.js"></script>
+  
+
+
+<script>hljs.initHighlightingOnLoad();</script>
+
+</body>
+</html>

@@ -1,0 +1,258 @@
+
+
+
+<!DOCTYPE html>
+<html lang="en,zh-CN,ja,default">
+<head>
+  <meta charset="UTF-8">
+  <title>Kotlin上路 [ hiaoyun-en ]</title>
+  
+  
+    <!-- stylesheets list from _config.yml -->
+    
+      <!-- 引入 CSS -->
+      <link rel="stylesheet" href="/css/noise.css">
+    
+      <!-- 引入 CSS -->
+      <link rel="stylesheet" href="/lib/fontawesome-free-5.11.2-web/css/all.css">
+    
+      <!-- 引入 CSS -->
+      <link rel="stylesheet" href="/lib/highlight/styles/atom-one-dark.css">
+    
+  
+<meta name="generator" content="Hexo 4.2.0"></head>
+<body>
+
+<!-- 引入导航菜单 -->
+ 
+<!-- 导航菜单 -->
+<div id="menu-outer">
+    <div id="menu-inner">
+        
+        <span id="menu-link-icon">
+            <a href="/">Home</a>
+        </span>
+        
+        <span id="menu-link-icon">
+            <a href="/archives">Archives</a>
+        </span>
+        
+        <span id="menu-link-icon">
+            <a href="/about">About</a>
+        </span>
+        
+    </div>
+</div>
+ 
+
+<div id="content-outer">
+  <div id="content-inner">
+     
+<article id="post">
+  <h1>Kotlin上路</h1>
+  <h2 id="开始"><a href="#开始" class="headerlink" title="开始"></a>开始</h2><h3 id="对一个对象实例调用多个方法（使用-with）"><a href="#对一个对象实例调用多个方法（使用-with）" class="headerlink" title="对一个对象实例调用多个方法（使用 with）"></a>对一个对象实例调用多个方法（使用 with）</h3><a id="more"></a>
+
+<pre><code class="kotlin">class Turtle {
+    fun penDown()
+    fun penUp()
+    fun turn(degrees: Double)
+    fun forward(pixels: Double)
+}
+
+val myTurtle = Turtle()
+with(myTurtle) { // 画一个 100 像素的正方形
+    penDown()
+    for(i in 1..4) {
+        forward(100.0)
+        turn(90.0)
+    }
+    penUp()
+}</code></pre>
+<h3 id="配置对象的属性（使用-apply）"><a href="#配置对象的属性（使用-apply）" class="headerlink" title="配置对象的属性（使用 apply）"></a>配置对象的属性（使用 apply）</h3><pre><code class="kotlin">val myRectangle = Rectangle().apply {
+    length = 4
+    breadth = 5
+    color = 0xFAFAFA
+}</code></pre>
+<h2 id="类与对象"><a href="#类与对象" class="headerlink" title="类与对象"></a>类与对象</h2><h3 id="属性与字段"><a href="#属性与字段" class="headerlink" title="属性与字段"></a>属性与字段</h3><h4 id="幕后字段"><a href="#幕后字段" class="headerlink" title="幕后字段"></a>幕后字段</h4><pre><code class="kotlin">var counter = 0 // Note: the initializer assigns the backing field directly
+    set(value) {
+        if (value &gt;= 0) field = value
+    }</code></pre>
+<p>用<code>value</code>的值指定<code>counter</code>的值。</p>
+<h4 id="幕后属性"><a href="#幕后属性" class="headerlink" title="幕后属性"></a>幕后属性</h4><pre><code class="kotlin">private var _table: Map&lt;String, Int&gt;? = null
+public val table: Map&lt;String, Int&gt;
+    get() {
+        if (_table == null) {
+            _table = HashMap() 
+        }
+        return _table ?: throw AssertionError(&quot;Set to null by another thread&quot;)
+    }</code></pre>
+<h3 id="可见性修饰符"><a href="#可见性修饰符" class="headerlink" title="可见性修饰符"></a>可见性修饰符</h3><p>类、对象、接口、构造函数、方法、属性和它们的 setter 都可以有可见性修饰符（getter 与属性有相同的可见性）。</p>
+<p>Kotlin 中有 <code>private</code> <code>protected</code> <code>internal</code> <code>public</code> 四个可见性修饰符，默认是<code>public</code>。</p>
+<p><code>internal</code> 模块内可见。</p>
+<p><strong>注意</strong>：Kotlin 中，外部类不能访问到内部类的<code>private</code>成员。</p>
+<h3 id="对象声明"><a href="#对象声明" class="headerlink" title="对象声明"></a>对象声明</h3><p>即一个关键字<code>object</code> 实现单例。</p>
+<h3 id="伴生对象"><a href="#伴生对象" class="headerlink" title="伴生对象"></a>伴生对象</h3><p>用<code>companion</code>关键字声明伴生对象，即类内部的对象。</p>
+<pre><code class="kotlin">class MyClass {
+    companion object Factory {
+        fun create(): MyClass = MyClass()
+    }
+}</code></pre>
+<h3 id="委托"><a href="#委托" class="headerlink" title="委托"></a>委托</h3><pre><code class="kotlin">interface Base {
+    fun print()
+}
+
+class BaseImpl(val x: Int) : Base {
+    override fun print() { print(x) }
+}
+
+class Derived(b: Base) : Base by b
+
+fun main() {
+    val b = BaseImpl(10)
+    Derived(b).print()
+}</code></pre>
+<p>可以看到<code>Derived</code>类相比普通的声明多了<code>by b</code>这部分，这部分的意思就是说<strong>把<code>b</code>的公有成员都委托给<code>Derived</code></strong>。</p>
+<h3 id="委托属性"><a href="#委托属性" class="headerlink" title="委托属性"></a>委托属性</h3><h4 id="标准委托"><a href="#标准委托" class="headerlink" title="标准委托"></a>标准委托</h4><p>Kotlin 标准库中内置了几种委托。</p>
+<h5 id="延迟属性-Lazy"><a href="#延迟属性-Lazy" class="headerlink" title="延迟属性 Lazy"></a>延迟属性 Lazy</h5><p><code>lazy()</code>接受一个 lambda 并返回一个<code>Lazy&lt;T&gt;</code>的实例，返回的实例作为延迟属性的委托。第一次调用 <code>get()</code> 会执行已传递给 <code>lazy()</code> 的 lambda 表达式并记录结果， 后续调用 <code>get()</code> 只返回记录的结果。</p>
+<h5 id="可观察属性-Observable"><a href="#可观察属性-Observable" class="headerlink" title="可观察属性 Observable"></a>可观察属性 Observable</h5><pre><code class="kotlin">import kotlin.properties.Delegates
+
+class User {
+    var name: String by Delegates.observable(&quot;&lt;no name&gt;&quot;) {
+        prop, old, new -&gt;
+        println(prop)
+        println(&quot;$old -&gt; $new&quot;)
+    }
+}
+
+fun main() {
+    val user = User()
+    user.name = &quot;first&quot;
+    user.name = &quot;second&quot;
+}</code></pre>
+<p><code>Delegates.observable()</code>接受两个参数初始值<code>inintalValue</code>和值改变时的回调方法<code>onChange</code>，<code>onChange</code>接受三个参数：被赋值的属性，旧值，新值。在回调方法被调用前，值已经改变过了。</p>
+<p><img src="https://i.loli.net/2020/03/18/ackj29neZWKuBOV.png" alt="image.png"></p>
+<p>如果需要拦截新值并否决，可以使用<code>vetoable()</code>代替<code>observable()</code>，在新值生效前会调用回调方法。</p>
+<h5 id="把属性储存在-map-中"><a href="#把属性储存在-map-中" class="headerlink" title="把属性储存在 map 中"></a>把属性储存在 map 中</h5><pre><code class="kotlin">class User(val map: Map&lt;String, Any?&gt;) {
+    val name: String by map
+    val age: Int     by map
+}
+
+fun main() {
+    val user = User(mapOf(
+        &quot;name&quot; to &quot;John Doe&quot;,
+        &quot;age&quot;  to 25
+    ))
+    println(user.name) // Prints &quot;John Doe&quot;
+    println(user.age)  // Prints 25
+}</code></pre>
+<h2 id="函数"><a href="#函数" class="headerlink" title="函数"></a>函数</h2><p>函数可以有默认参数。当覆盖（重写）一个有默认参数的函数时，新函数不可以设置默认值。</p>
+<p>当向函数传递参数时，可以指定参数的名称。</p>
+<p>函数的可变参数（通常是最后一个）可以用 <code>vararg</code> 修饰符标记。当把一个数组<code>a</code>传给可变参数，可以用<code>*a</code>（伸展操作符 Spread ）。</p>
+<h3 id="高阶函数和-Lambda-表达式"><a href="#高阶函数和-Lambda-表达式" class="headerlink" title="高阶函数和 Lambda 表达式"></a>高阶函数和 Lambda 表达式</h3><p>高阶函数是将函数用作参数或返回值的函数。</p>
+<p>Kotlin 中，如果一个函数的参数的最后一个参数为函数，则这个函数参数可以放在<code>()</code>外，写在<code>{}</code>里。更甚，如只有一个参数且为函数，则<code>()</code>也可省略。</p>
+<p>Lambda 表达式或者匿名函数（以及<a href="https://www.kotlincn.net/docs/reference/functions.html#局部函数" target="_blank" rel="noopener">局部函数</a>和<a href="https://www.kotlincn.net/docs/reference/object-declarations.html#对象表达式" target="_blank" rel="noopener">对象表达式</a>） 可以访问其 <strong>闭包</strong> ，即在外部作用域中声明的变量。 在 lambda 表达式中可以修改闭包中捕获的变量：</p>
+<pre><code class="kotlin">var sum = 0
+ints.filter { it &gt; 0 }.forEach {
+    sum += it
+}
+print(sum)</code></pre>
+<h3 id="内联函数"><a href="#内联函数" class="headerlink" title="内联函数"></a>内联函数</h3><p><code>inline</code>修饰符会影响函数本身和传给它的 lambda 表达式，它们被内联到调用处，可以提高一些效率。</p>
+<pre><code class="kotlin">inline fun &lt;T&gt; lock(lock: Lock, body: () -&gt; T): T { …… }</code></pre>
+<pre><code class="kotlin">lock(l) { foo() }</code></pre>
+<pre><code class="kotlin">l.lock()
+try {
+    foo()
+}
+finally {
+    l.unlock()
+}</code></pre>
+<h3 id="扩展函数"><a href="#扩展函数" class="headerlink" title="扩展函数"></a>扩展函数</h3><pre><code class="kotlin">fun MutableList&lt;Int&gt;.swap(index1: Int, index2: Int) {
+    val tmp = this[index1] 
+    this[index1] = this[index2]
+    this[index2] = tmp
+}</code></pre>
+<pre><code class="kotlin">val list = mutableListOf(1, 2, 3)
+list.swap(0, 2) </code></pre>
+<h3 id="作用域函数"><a href="#作用域函数" class="headerlink" title="作用域函数"></a>作用域函数</h3><table>
+<thead>
+<tr>
+<th align="left">函数</th>
+<th align="left">对象引用</th>
+<th align="left">返回值</th>
+<th align="left">是否是扩展函数</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><code>let</code></td>
+<td align="left"><code>it</code></td>
+<td align="left">Lambda 表达式结果</td>
+<td align="left">是</td>
+</tr>
+<tr>
+<td align="left"><code>run</code></td>
+<td align="left"><code>this</code></td>
+<td align="left">Lambda 表达式结果</td>
+<td align="left">是</td>
+</tr>
+<tr>
+<td align="left"><code>run</code></td>
+<td align="left">-</td>
+<td align="left">Lambda 表达式结果</td>
+<td align="left">不是：调用无需上下文对象</td>
+</tr>
+<tr>
+<td align="left"><code>with</code></td>
+<td align="left"><code>this</code></td>
+<td align="left">Lambda 表达式结果</td>
+<td align="left">不是：把上下文对象当做参数</td>
+</tr>
+<tr>
+<td align="left"><code>apply</code></td>
+<td align="left"><code>this</code></td>
+<td align="left">上下文对象</td>
+<td align="left">是</td>
+</tr>
+<tr>
+<td align="left"><code>also</code></td>
+<td align="left"><code>it</code></td>
+<td align="left">上下文对象</td>
+<td align="left">是</td>
+</tr>
+</tbody></table>
+<h2 id="协程"><a href="#协程" class="headerlink" title="协程"></a>协程</h2><h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p>待</p>
+<p>2020-3-17 23:50:39</p>
+
+</article>
+
+<div id="paginator">
+  
+</div>
+
+  </div>
+</div>
+
+<div id="bottom-outer">
+    <div id="bottom-inner">
+        Site by Aoyun using
+        <a href="http://hexo.io" target="_blank" rel="noopener">hexo blog framework</a>.
+        <br>
+        <a href="/">Home</a>
+    </div>
+</div> 
+<button class="back-to-top">↑</button>
+
+<!-- 引入 JS -->
+<script src="https://ajax.aspnetcdn.com/ajax/jquery/jquery-1.9.0.min.js"></script>
+
+  <!-- scripts list from theme config.yml -->
+  
+    <script src="/js/noise.js"></script>
+  
+    <script src="/lib/highlight/highlight.pack.js"></script>
+  
+
+
+<script>hljs.initHighlightingOnLoad();</script>
+
+</body>
+</html>

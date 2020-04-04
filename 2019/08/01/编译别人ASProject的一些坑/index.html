@@ -1,0 +1,201 @@
+
+
+
+<!DOCTYPE html>
+<html lang="en,zh-CN,ja,default">
+<head>
+  <meta charset="UTF-8">
+  <title>编译别人ASProject的一些坑 [ hiaoyun-en ]</title>
+  
+  
+    <!-- stylesheets list from _config.yml -->
+    
+      <!-- 引入 CSS -->
+      <link rel="stylesheet" href="/css/noise.css">
+    
+      <!-- 引入 CSS -->
+      <link rel="stylesheet" href="/lib/fontawesome-free-5.11.2-web/css/all.css">
+    
+      <!-- 引入 CSS -->
+      <link rel="stylesheet" href="/lib/highlight/styles/atom-one-dark.css">
+    
+  
+<meta name="generator" content="Hexo 4.2.0"></head>
+<body>
+
+<!-- 引入导航菜单 -->
+ 
+<!-- 导航菜单 -->
+<div id="menu-outer">
+    <div id="menu-inner">
+        
+        <span id="menu-link-icon">
+            <a href="/">Home</a>
+        </span>
+        
+        <span id="menu-link-icon">
+            <a href="/archives">Archives</a>
+        </span>
+        
+        <span id="menu-link-icon">
+            <a href="/about">About</a>
+        </span>
+        
+    </div>
+</div>
+ 
+
+<div id="content-outer">
+  <div id="content-inner">
+     
+<article id="post">
+  <h1>编译别人ASProject的一些坑</h1>
+  <p>报错：</p>
+<a id="more"></a>
+
+<pre><code>Failed to find Build Tools revision 26.0.1
+Install Build Tools 26.0.1 and sync project</code></pre><p>解决：</p>
+<ul>
+<li><p>![Build Tools](编译别人ASProject的一些坑\Build Tools.png “到如图所示的位置”)</p>
+<p>找到安装的版本，在<code>app/build.gradle</code>的<code>android</code>层级下修改<code>buildToolsVersion</code></p>
+<pre><code>android {
+    compileSdkVersion 28
+    buildToolsVersion &quot;28.0.3&quot;
+    defaultConfig {</code></pre></li>
+<li><p>按AS说的做</p>
+<p>点击<code>Install Build Tools 26.0.1 and sync project</code></p>
+</li>
+</ul>
+<hr>
+<p>报错：</p>
+<pre><code>No toolchains found in the NDK toolchains folder for ABI with prefix: mips64el-linux-android</code></pre><p>解决：</p>
+<p><a href="https://blog.csdn.net/vocanicy/article/details/83004626" target="_blank" rel="noopener">https://blog.csdn.net/vocanicy/article/details/83004626</a></p>
+<p><code>build.gradle</code>改为3.1以上（具体可以新建一个项目查看）</p>
+<pre><code>        classpath &#39;com.android.tools.build:gradle:3.2.1&#39;</code></pre><hr>
+<p>报错：</p>
+<pre><code>Could not find com.android.tools.build:gradle:3.2.1.
+Searched in the following locations:
+    https://jcenter.bintray.com/com/android/tools/build/gradle/3.2.1/gradle-3.2.1.pom
+    https://jcenter.bintray.com/com/android/tools/build/gradle/3.2.1/gradle-3.2.1.jar
+Required by:
+    project :
+Add Google Maven repository and sync project
+Open File
+Enable embedded Maven repository and sync project</code></pre><p>解决：</p>
+<p>按AS说的做</p>
+<p>点击</p>
+<p><code>Add Google Maven repository and sync project</code></p>
+<p><code>Enable embedded Maven repository and sync project</code></p>
+<p>其中之一</p>
+<hr>
+<p>报错：</p>
+<pre><code>Could not find com.android.support:appcompat-v7:25.3.1.
+Required by:
+​    project :app
+
+Please install the Android Support Repository from the Android SDK Manager.</code></pre><p>解决：</p>
+<p>按AS说的做</p>
+<p>File | Settings | Appearance &amp; Behavior | System Settings | Android SDK</p>
+<p>SDK Tools 下载 Android Support Repository</p>
+<hr>
+<p>报错：</p>
+<pre><code>Could not find com.android.support.constraint:constraint-layout:1.0.1.
+Required by:
+​    project :app
+Search in build.gradle files</code></pre><p>解决：</p>
+<p>![](编译别人ASProject的一些坑\SDK Tools.png)</p>
+<p>安装对应的版本（这里是1.0.1）</p>
+<hr>
+<p>报错：</p>
+<pre><code>Cause: android-apt plugin is incompatible with the Android Gradle plugin.  Please use 
+&#39;annotationProcessor&#39; configuration instead.</code></pre><p>原因：</p>
+<p><a href="https://blog.csdn.net/wusj3/article/details/74036463" target="_blank" rel="noopener">https://blog.csdn.net/wusj3/article/details/74036463</a></p>
+<p>Gradle插件2.2之前，APT(Annotation Processing Tool)框架一般使用第三方android-apt库。2.2内置annotationProcessor，android-apt作者同时宣布不再维护。annotationProcessor同时支持javac和jack编译方式，而android-apt只支持javac编译方式。</p>
+<p>解决：</p>
+<p><code>app/build.gradle</code></p>
+<p>删掉</p>
+<pre><code>apply plugin: &#39;android-apt&#39;</code></pre><p>把</p>
+<pre><code>    apt &#39;com.jakewharton:butterknife-compiler:8.2.1&#39;</code></pre><p>替换成</p>
+<pre><code>    annotationProcessor &#39;com.jakewharton:butterknife-compiler:8.2.1&#39;</code></pre><hr>
+<p>报错：</p>
+<pre><code>Lint found fatal errors while assembling a release target.
+
+To proceed, either fix the issues identified by lint, or modify your build script as follows:
+...
+android {
+    lintOptions {
+        checkReleaseBuilds false
+        // Or, if you prefer, you can continue to check for errors in release builds,
+        // but continue the build even when errors are found:
+        abortOnError false
+    }
+}
+...</code></pre><p>解决：</p>
+<blockquote>
+<p>可能不是好的解决方法</p>
+</blockquote>
+<p>按AS说的做</p>
+<p>粘贴</p>
+<pre><code>lintOptions {
+        checkReleaseBuilds false
+        // Or, if you prefer, you can continue to check for errors in release builds,
+        // but continue the build even when errors are found:
+        abortOnError false
+}</code></pre><p>到<code>app/build.gradle</code></p>
+<hr>
+<p>报错：</p>
+<pre><code>Configuration &#39;androidTestCompile&#39; is obsolete and has been replaced with &#39;androidTestImplementation&#39; and &#39;androidTestApi&#39;.
+It will be removed at the end of 2018. For more information see: http://d.android.com/r/tools/update-dependency-configurations.html
+
+
+Configuration &#39;compile&#39; is obsolete and has been replaced with &#39;implementation&#39; and &#39;api&#39;.
+It will be removed at the end of 2018. For more information see: http://d.android.com/r/tools/update-dependency-configurations.html
+
+
+Configuration &#39;androidTestApi&#39; is obsolete and has been replaced with &#39;androidTestImplementation&#39;.
+It will be removed at the end of 2018. For more information see: http://d.android.com/r/tools/update-dependency-configurations.html
+
+
+Configuration &#39;testCompile&#39; is obsolete and has been replaced with &#39;testImplementation&#39; and &#39;testApi&#39;.
+It will be removed at the end of 2018. For more information see: http://d.android.com/r/tools/update-dependency-configurations.html
+
+Configuration &#39;testApi&#39; is obsolete and has been replaced with &#39;testImplementation&#39;.
+It will be removed at the end of 2018. For more information see: http://d.android.com/r/tools/update-dependency-configurations.html</code></pre><p>解决：</p>
+<p>按AS说的做</p>
+<p>把<code>app/build.gradle</code>中过时的替换掉</p>
+<hr>
+
+</article>
+
+<div id="paginator">
+  
+</div>
+
+  </div>
+</div>
+
+<div id="bottom-outer">
+    <div id="bottom-inner">
+        Site by Aoyun using
+        <a href="http://hexo.io" target="_blank" rel="noopener">hexo blog framework</a>.
+        <br>
+        <a href="/">Home</a>
+    </div>
+</div> 
+<button class="back-to-top">↑</button>
+
+<!-- 引入 JS -->
+<script src="https://ajax.aspnetcdn.com/ajax/jquery/jquery-1.9.0.min.js"></script>
+
+  <!-- scripts list from theme config.yml -->
+  
+    <script src="/js/noise.js"></script>
+  
+    <script src="/lib/highlight/highlight.pack.js"></script>
+  
+
+
+<script>hljs.initHighlightingOnLoad();</script>
+
+</body>
+</html>

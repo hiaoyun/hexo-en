@@ -1,0 +1,400 @@
+
+
+
+<!DOCTYPE html>
+<html lang="en,zh-CN,ja,default">
+<head>
+  <meta charset="UTF-8">
+  <title>译·RxJava [ hiaoyun-en ]</title>
+  
+  
+    <!-- stylesheets list from _config.yml -->
+    
+      <!-- 引入 CSS -->
+      <link rel="stylesheet" href="/css/noise.css">
+    
+      <!-- 引入 CSS -->
+      <link rel="stylesheet" href="/lib/fontawesome-free-5.11.2-web/css/all.css">
+    
+      <!-- 引入 CSS -->
+      <link rel="stylesheet" href="/lib/highlight/styles/atom-one-dark.css">
+    
+  
+<meta name="generator" content="Hexo 4.2.0"></head>
+<body>
+
+<!-- 引入导航菜单 -->
+ 
+<!-- 导航菜单 -->
+<div id="menu-outer">
+    <div id="menu-inner">
+        
+        <span id="menu-link-icon">
+            <a href="/">Home</a>
+        </span>
+        
+        <span id="menu-link-icon">
+            <a href="/archives">Archives</a>
+        </span>
+        
+        <span id="menu-link-icon">
+            <a href="/about">About</a>
+        </span>
+        
+    </div>
+</div>
+ 
+
+<div id="content-outer">
+  <div id="content-inner">
+     
+<article id="post">
+  <h1>译·RxJava</h1>
+  <p><a href="https://medium.com/@kevalpatel2106/what-is-reactive-programming-da37c1611382" target="_blank" rel="noopener">https://medium.com/@kevalpatel2106/what-is-reactive-programming-da37c1611382</a></p>
+<h1 id="什么是响应式编程？"><a href="#什么是响应式编程？" class="headerlink" title="什么是响应式编程？"></a>什么是响应式编程？</h1><a id="more"></a>
+
+<p>如今，所有人都在讨论响应式编程（Reactive Programming），而且你想学习这个叫做响应式编程的新东西。可能你已经在一些地方使用过TA了，但你还是有些疑惑要阐明清楚。</p>
+<p>在这篇文章里，我们将要学习关于响应式编程的基本概念。下一篇文章开始我们要真正的编程，还有学习如何把RxJava运用在Android程序开发中。</p>
+<p>先要明白我们遇到的问题。为什么我们需要响应式编程？如果没有问题，那我们也不需要解决方法了。</p>
+<h2 id="为什么我们需要异步"><a href="#为什么我们需要异步" class="headerlink" title="为什么我们需要异步"></a>为什么我们需要异步</h2><p>最简单的答案就是我们想要提升用户体验。我们想要我们的应用更具有响应性。我们不想阻塞主线程，不想让应用运行缓慢，不想向用户提供糟糕的用户体验，想给用户平滑的用户体验。</p>
+<p>为了让主线程自由运行，我们要把我们想要做的大量耗时的工作放在后台线程中。因为我们的移动设备不能做繁重的工作，所以我们想把繁重的工作和复杂的计算放在服务器进行。所以我们需要异步来进行网络操作。</p>
+<h2 id="评价矩阵"><a href="#评价矩阵" class="headerlink" title="评价矩阵"></a>评价矩阵</h2><p><img src="https://i.loli.net/2020/03/16/42Y5rxlkwB9o8hN.png" alt="1_cbi_HDYYHDSp7tm4IzVlQg.png"></p>
+<p>我们需要从库中得到些什么来处理所有的异步工作。你可以把下面四点当做异步库的评价矩阵。</p>
+<ul>
+<li><strong>执行清晰</strong>：如果我们把一大堆工作放在新线程执行，我们应该能控制TA。如果你将进行一些后台任务，你就要收集信息，做些准备。一旦你准备好了，你将可以立即开始后台任务。</li>
+<li><strong>线程管理简单</strong>：在异步任务中，线程管理是关键。我们经常要在后台线程执行的中间或结束时在主线程更新UI。因此，我们需要把工作从一个线程（后台线程）传递到另一个线程（这里是主线程）。因此，要能简单切换线程还有在需要的时候传递数据。</li>
+<li><strong>容易组合</strong>：理想情况下，后台线程在运行时，TA不应该依赖任何其他线程（尤其是UI线程）而且应该与其他线程保持独立，直到TA运行结束。但实际情况，我们有很多事情需要让线程相互依赖，如更新UI、改变数据库等。所以异步库应容易组合，给错误留下更少的发生空间。</li>
+<li><strong>副作用最小</strong>：当多线程同时工作时，一个线程应该对其他线程产生最小的副作用。这让你的代码容易阅读和理解，让错误更容易被追踪。</li>
+</ul>
+<h2 id="什么是响应式编程？-1"><a href="#什么是响应式编程？-1" class="headerlink" title="什么是响应式编程？"></a>什么是响应式编程？</h2><p>根据维基百科：</p>
+<blockquote>
+<p><strong>响应式编程</strong>是一种面向数据流动和改变传递的编程范式。这意味着使用编程语言能简单地传递静态和动态的数据流，而且这个基础执行模型会自动地通过数据流传递改变。</p>
+</blockquote>
+<p>简而言之，在响应式编程中数据流由一个成分发送，然后响应式编程库提供的基础结构会把改变传递给那些注册了要接受这些数据改变的成分。长话短说：Rx由下面这3个关键点组成。</p>
+<blockquote>
+<p><strong>RX = OBSERVABLE + OBSERVER + SCHEDULERS</strong></p>
+</blockquote>
+<p>我们将逐一详细讨论这三点。</p>
+<ul>
+<li><strong>Observable</strong>：Observable就是数据流。Observable把数据打包，使其能从一个线程传递到另一个线程。在TA的生命周期中，TA们基本上是周期性的发送数据或是只发送一次数据，这要看TA们的配置。有各种各样的操作符可以帮Observable发送某些特定类型的数据——根据具体的事件，但我们要在以后讨论TA。</li>
+<li><strong>Observers</strong>：Observer消耗Observable发送的数据流。Observer通过<code>subscribeOn()</code>方法订阅Observable，来接收Observable发送的数据。当observable发送数据时，所有注册了的Observer会在<code>onNext()</code>方法中接收数据。在这里可以进行各种操作，如解析JSON或更新UI。如果有错误从observable被抛出，observer会在<code>onError()</code>中接收到。</li>
+<li><strong>Schedulers</strong>：记住Rx是用来进行异步编程的，所以我们需要线程管理，这就是schedulers发挥作用的地方。Schedulers在Rx中是告诉Observable和Observer运行在哪个线程的成分。你可以使用<code>observeOn()</code>方法告诉observer在哪个线程观察。同样地，你可以用<code>scheduleOn()</code>方法告诉observable应该运行在哪个线程。RxJava中已经有些默认的线程，像<code>Schedulers.newThread()</code>会在后台创建一个新线程，<code>Schedulers.io()</code>会在主线程执行代码。</li>
+</ul>
+<h2 id="3个简单的步骤来吧Rx运用在你的app中"><a href="#3个简单的步骤来吧Rx运用在你的app中" class="headerlink" title="3个简单的步骤来吧Rx运用在你的app中"></a>3个简单的步骤来吧Rx运用在你的app中</h2><p><img src="https://i.loli.net/2020/03/16/TYl54JgRXKatho3.png" alt="1_-N6sUYNrO615PQCeKtP0Kw.png"></p>
+<p>让我们看一个简单的示例。TA解释了3个简单的步骤把响应式编程运用在你的app中。</p>
+<pre><code class="java">Observable&lt;String&gt; database = Observable      //Observable. This will emit the data
+                .just(new String[]{&quot;1&quot;, &quot;2&quot;, &quot;3&quot;, &quot;4&quot;});    //Operator
+
+ Observer&lt;String&gt; observer = new Observer&lt;String&gt;() {
+           @Override
+            public void onCompleted() {
+                //...
+            }
+
+            @Override
+            public void onError(Throwable e) {
+                //...
+            }
+
+            @Override
+            public void onNext(String s) {
+                //...
+            }
+        };
+
+database.subscribeOn(Schedulers.newThread())          //Observable runs on new background thread.
+        .observeOn(AndroidSchedulers.mainThread())    //Observer will run on main UI thread.
+        .subscribe(observer);                         //Subscribe the observer</code></pre>
+<h3 id="步骤-1-创建发送数据的observable："><a href="#步骤-1-创建发送数据的observable：" class="headerlink" title="步骤-1 创建发送数据的observable："></a>步骤-1 创建发送数据的observable：</h3><p>这里数据库是一个observable，TA发送数据。在我们的例子中，TA发送字符串。<code>just()</code>是一个操作符，这让在参数中提供的数据一个一个地发送。（我们将在接下来的文章中介绍操作符。所以不用担心。）</p>
+<h3 id="步骤-2-创建消耗数据的observer："><a href="#步骤-2-创建消耗数据的observer：" class="headerlink" title="步骤-2 创建消耗数据的observer："></a>步骤-2 创建消耗数据的observer：</h3><p>在上面的代码中，observer是一个消耗数据库observable发送的数据的observer。TA处理接收的的数据，也处理错误。</p>
+<h3 id="步骤-3-管理并发"><a href="#步骤-3-管理并发" class="headerlink" title="步骤-3 管理并发"></a>步骤-3 管理并发</h3><p>在最后一步，我们定义了Schedulers来管理并发。<code>subscribeOn(Schedulers.newThread())</code>告诉数据库observable运行在后台线程，<code>observeOn(AndroidSchedulers.mainThread())</code>告诉observer运行在主线程。这是响应式编程的基本代码。</p>
+<p>所以至此，你应该明白了为什么我们需要响应式编程，为什么我们需要TA们，还有怎样实现TA。在接下来的文章中，我们将学习如何使用RxJava和详细了解其操作符。</p>
+<hr>
+<p><a href="https://medium.com/@kevalpatel2106/code-your-next-android-app-using-rxjava-d1db30ac9fcc" target="_blank" rel="noopener">https://medium.com/@kevalpatel2106/code-your-next-android-app-using-rxjava-d1db30ac9fcc</a></p>
+<h1 id="把RxJava用在你的下一个Android应用中"><a href="#把RxJava用在你的下一个Android应用中" class="headerlink" title="把RxJava用在你的下一个Android应用中"></a>把RxJava用在你的下一个Android应用中</h1><p>RxJava在全世界的Android开发世界都是一个热门话题。唯一的问题就是TA们难以理解，特别是你从面向对象编程转为函数响应式编程。所以我写了一系列文章帮助你理解响应式编程中的基本概念。</p>
+<p>在第一部分，我们知道了响应式编程的基本概念。如果你还没读过，推荐你去看一下，了解基本概念。</p>
+<p>正如我们在第一部分讨论的，Rx由下面3个关键点组成。</p>
+<blockquote>
+<p><strong>RX = OBSERVABLE + OBSERVER + SCHEDULERS</strong></p>
+</blockquote>
+<p>让我们一个个创建出来，但首先要进行项目集成。</p>
+<h2 id="集成RxAndroid到项目"><a href="#集成RxAndroid到项目" class="headerlink" title="集成RxAndroid到项目"></a>集成RxAndroid到项目</h2><p>RxAndroid基本上是对RxJava关于Android的特性的包装，提供一些明确作用于Android而RxJava不能提供的。所以，如果你只想把Rx集成到你的Java工程中，你就不用引入RxAndroid的库。</p>
+<p>这是RxJava和RxAndroid的Gradle依赖。</p>
+<blockquote>
+<p><a href="https://github.com/ReactiveX/RxAndroid#binaries" target="_blank" rel="noopener">最新版本</a></p>
+</blockquote>
+<pre><code class="groovy">dependencies {
+    compile &#39;io.reactivex:rxandroid:1.2.1&#39;
+    // Because RxAndroid releases are few and far between, it is recommended you also
+    // explicitly depend on RxJava&#39;s latest version for bug fixes and new features.
+    compile &#39;io.reactivex:rxjava:1.1.6&#39;
+}</code></pre>
+<h2 id="Marble-Diagram"><a href="#Marble-Diagram" class="headerlink" title="Marble Diagram"></a>Marble Diagram</h2><p>Rx使用marble diagram解释操作符怎么工作。Marble diagram很方便且容易理解。</p>
+<ul>
+<li>方框上的线表示原始数据。这些数据需要observable发送。不同类型的对象由不同的形状表示。</li>
+<li>中间的方框代表操作符。还有其他很多操作符，TA们基本上就是控制observable何时、怎样发送数据。我们在将来再看这些操作符。</li>
+<li>方框下面的线代表observable发送的的数据。RxJava中的observer接收这些发送的数据。</li>
+</ul>
+<p><img src="https://i.loli.net/2020/03/16/ryhbALa2dRGOXmg.png" alt="1_-RggxXyfw1M3CrYkzGTRDw.png"></p>
+<h2 id="创建observable"><a href="#创建observable" class="headerlink" title="创建observable"></a>创建observable</h2><p>就像你知道的，observable就是用来发送数据流的。下面的observable把1-5一个一个发送。</p>
+<p>这里<code>just()</code>就是操作符。TA只是发送参数中的值。（这就是为什么TA叫做just。）</p>
+<p><img src="https://i.loli.net/2020/03/16/JzBEi8m5R3vY74X.png" alt="img"></p>
+<pre><code class="java">Observable.just(1, 2, 3, 4, 5)</code></pre>
+<p>有时我们想提炼被observable发送的数据。比如上面一个例子，我们只想要observable发送的奇数数字。我们用<code>filter()</code>操作符实现。就像名字那样，filter操作符过滤observable发送的项目。</p>
+<p><img src="https://i.loli.net/2020/03/16/S4gEAn8NPu9d3HW.png" alt="1_1FlWy5mNEKsgpzwVDARX6A.png"></p>
+<pre><code class="java"> Observable
+    .just(1, 2, 3, 4, 5)
+    .filter(new Func1&lt;Integer, Boolean&gt;() {
+        @Override
+        public Boolean call(Integer integer) {
+            //check if the number is odd? If the number is odd return true, to emmit that object.
+            return integer % 2 != 0;
+        }
+    });</code></pre>
+<h2 id="创建observer"><a href="#创建observer" class="headerlink" title="创建observer"></a>创建observer</h2><p>observer消耗observable发送的数据。当observable发送数据时，所有注册了的observer都会接收到数据。</p>
+<p>在RxJava中，在接收数据时有3个回调方法。</p>
+<ul>
+<li><strong><code>onNext()</code></strong>：新的数据被发送的时候，observer会回调这个方法。observable发送的数据能在这个回调方法的参数中得到。</li>
+<li><strong><code>onError()</code></strong>：observable发生错误的时候，会回调这个方法。（毕竟这个世界并不完美。）</li>
+<li><strong><code>onComplete()</code></strong>：当observable发送完所有数据时，这个方法会被回调，表示没有数据要被发送了。</li>
+</ul>
+<pre><code class="java">Observer&lt;Integer&gt; observer = new Observer&lt;Integer&gt;() {
+    @Override
+    public void onCompleted() {
+        System.out.println(&quot;All data emitted.&quot;);
+    }
+
+    @Override
+    public void onError(Throwable e) {
+        System.out.println(&quot;Error received: &quot; + e.getMessage());
+    }
+
+    @Override
+    public void onNext(Integer integer) {
+        System.out.println(&quot;New data received: &quot; + integer);
+    }
+};</code></pre>
+<p>在很多情况下用不到<code>onComplete()</code>和<code>onError()</code>方法。所以我们可以用一个简化的类<code>Action1</code>，来定义我们在<code>onNext()</code>中的操作，而不是使用<code>Observer&lt;T&gt;</code>类。</p>
+<pre><code class="java">Action1&lt;Integer&gt; onNextAction = new Action1&lt;Integer&gt;() {
+    @Override
+    public void call(Integer s) { //This is eqivelent to onNext()
+        System.out.println(s);
+    }
+};</code></pre>
+<p>这里，<code>onCall()</code>等价于第一种方法中的<code>onNext()</code>。</p>
+<h2 id="使用Scheduler管理并发"><a href="#使用Scheduler管理并发" class="headerlink" title="使用Scheduler管理并发"></a>使用Scheduler管理并发</h2><p>scheduler在响应式编程中用来管理并发。</p>
+<p>在Android中异步任务最常见的操作就是在主线程观察任务的结果，从而来更新UI。Android原生提供了AsyncTask来实现。在RxJava中，可以用schedulers来实现。</p>
+<p>有两个方法来管理线程。</p>
+<ul>
+<li><strong><code>subscribeOn()</code></strong>：指定observable运行的线程。</li>
+<li><strong><code>observerOn()</code></strong>：指定observer运行的线程。</li>
+</ul>
+<p>RxJava和RxAndroid预置了一些scheduler。比如，<code>Schedulers.io()</code>代表IO线程。而<code>Schedulers.newThread()</code>将会创建一个新线程来运行observer/observable。你可以在这里找到各种schedulers。</p>
+<p>最后，我们将用<code>subscribe()</code>来订阅observer，让observer来接收observable发出的数据。这将返回<code>Subscription</code>对象，这个<code>Subscription</code>对象持有连接observer和observable的引用。</p>
+<pre><code class="java">Observable&lt;Integer&gt; observable = Observable
+  .just(1, 2, 3, 4, 5)
+  .filter(new Func1&lt;Integer, Boolean&gt;() {
+      @Override
+      public Boolean call(Integer integer) {
+          //check if the number is odd? If the number is odd return true, to emmit that object.
+          return integer % 2 != 0;
+      }
+  });
+
+Observer&lt;Integer&gt; observer = new Observer&lt;Integer&gt;() {
+  @Override
+  public void onCompleted() {
+      System.out.println(&quot;All data emitted.&quot;);
+  }
+
+  @Override
+  public void onError(Throwable e) {
+      System.out.println(&quot;Error received: &quot; + e.getMessage());
+  }
+
+  @Override
+  public void onNext(Integer integer) {
+      System.out.println(&quot;New data received: &quot; + integer);
+  }
+};
+
+Subscription subscription = observable
+  .subscribeOn(Schedulers.io())       //observable will run on IO thread.
+  .observeOn(AndroidSchedulers.mainThread())      //Observer will run on main thread.
+  .subscribe(observer);               //subscribe the observer</code></pre>
+<p>让我们看下上面程序的运行结果。</p>
+<p><img src="https://i.loli.net/2020/03/16/f6OSMyc4xqm5Gva.png" alt="1_6ZDEDXeWTWsRAsYbXIpjVw.png"></p>
+<p>我们可以从结果看出，只有奇数被observable发送出来了。最后，当所有数据发送完后，<code>onComplete()</code>方法将会执行。</p>
+<h2 id="取消订阅"><a href="#取消订阅" class="headerlink" title="取消订阅"></a>取消订阅</h2><p>如果你想从observable取消observer的订阅，你可以调用unsubscribe。</p>
+<pre><code class="java">subscription.unsubscribe();</code></pre>
+<p>在Android中，在<code>onDestory()</code>中取消订阅来释放observer和observable的连接是至关重要的，否则可能会导致内存泄露。</p>
+<p>如果你在类中有多个subscription，你可以使用<code>CompositeSubscription</code>来一次取消所有的订阅。下面是一个实例：</p>
+<pre><code class="java">public class MainActivity extends BaseActivity {
+    private CompositeSubscription mSubscription = new CompositeSubscription();
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+      //...
+      //...
+      //...
+
+      mSubscription.add(subscription1); //Add subscription 1
+      mSubscription.add(subscription2); //Add subscription 2
+    } 
+
+  @Override
+  public void onDestroy() {
+      super.onDestroy();
+
+      //Unsubscribe both subscriptions.
+      mSubscription.unsubscribe();
+  }
+}</code></pre>
+<p>下一部分讲一些操作符。</p>
+<hr>
+<p> <a href="https://medium.com/@kevalpatel2106/what-should-you-know-about-rx-operators-54716a16b310" target="_blank" rel="noopener">https://medium.com/@kevalpatel2106/what-should-you-know-about-rx-operators-54716a16b310</a> </p>
+<h1 id="关于Rx操作符你需要知道的所有"><a href="#关于Rx操作符你需要知道的所有" class="headerlink" title="关于Rx操作符你需要知道的所有"></a>关于Rx操作符你需要知道的所有</h1><p>RxJava在Android开发中被谈得火热。不论在新手开发者还是有经验的开发者中都是一个热门话题。如果你不知道什么是响应式编程，不知道TA有什么用，我强烈推荐你看一下这个系列的第一篇文章：<a href="https://aoyun.me/2020/03/16/%E8%AF%91%C2%B7rxjava/#%E4%BB%80%E4%B9%88%E6%98%AF%E5%93%8D%E5%BA%94%E5%BC%8F%E7%BC%96%E7%A8%8B%EF%BC%9F" target="_blank" rel="noopener">什么是响应式编程</a>？</p>
+<p>响应式编程在两方面有用：</p>
+<ul>
+<li>TA提供了超级简单的接口来处理你应用程序中的并发和线程调度。而且，TA让你的代码更加简洁易读。如果你不知道怎样在Android工程中使用RxJava，你可以看下<a href="https://aoyun.me/2020/03/16/%E8%AF%91%C2%B7rxjava/#%E6%8A%8ARxJava%E7%94%A8%E5%9C%A8%E4%BD%A0%E7%9A%84%E4%B8%8B%E4%B8%80%E4%B8%AAAndroid%E5%BA%94%E7%94%A8%E4%B8%AD" target="_blank" rel="noopener">把RxJava用在你的下一个Android应用中</a>。</li>
+<li>使用Rx操作符。Rx操作符的功能就是定义observable，怎样、何时发送数据流。在RxJava中有数百种操作符可用。你可以<a href="https://github.com/ReactiveX/RxJava/wiki/Alphabetical-List-of-Observable-Operators" target="_blank" rel="noopener">这里</a>找到以字母排序的所有操作符的列表。// …TODO</li>
+</ul>
+<h2 id="有趣的事实"><a href="#有趣的事实" class="headerlink" title="有趣的事实"></a>有趣的事实</h2><ul>
+<li>大多数作用在Observable上的操作符会返回Observable。这允许你一个接一个地链式地使用操作符。每一个操作符都会修改前一个操作符作用后的Observable。</li>
+<li>链式的操作符不是独立作用于原始的Observable的，而是轮流作用。每一个操作符都会作用于前一个操作符作用后的Observable。</li>
+</ul>
+<p>看第一个操作符。</p>
+<blockquote>
+<p>有很多重复的操作符，有着几乎相同的功能。我会尽量同时讲到TA们。</p>
+</blockquote>
+<h2 id="创建Observable"><a href="#创建Observable" class="headerlink" title="创建Observable"></a>创建Observable</h2><h3 id="1-just"><a href="#1-just" class="headerlink" title="1.just()"></a>1.<code>just()</code></h3><p>就像名字讲的那样，just操作符发送参数里的值。没什么其他的了。</p>
+<p><img src="https://i.loli.net/2020/03/16/JzBEi8m5R3vY74X.png" alt="1_tLdm40Irt49HmeNlWS6RYQ.png"></p>
+<pre><code class="java">Observable.just(1, 2, 3, 4, 5)</code></pre>
+<p>这里的Observable使用了just操作符。所以，observable将发送1-5的整数，一个接一个。</p>
+<ul>
+<li><p>有另一个操作符<code>from()</code>，TA接收一个对象数组作为输入，然后就像<code>just()</code>操作符一样一个一个发送对象。下面的代码片段使用<code>from()</code>操作符发送1-5的整数。</p>
+<pre><code class="java">  Observable.from(new Integer[]{1, 2, 3, 4, 5});</code></pre>
+</li>
+</ul>
+<h2 id="过滤操作符"><a href="#过滤操作符" class="headerlink" title="过滤操作符"></a>过滤操作符</h2><ul>
+<li>过滤操作符基于一些表达式过滤数据流，只发送符合条件的数据。</li>
+<li>这里，我将解释其中的一些。你可以在<a href="https://github.com/ReactiveX/RxJava/wiki/Alphabetical-List-of-Observable-Operators" target="_blank" rel="noopener">这里</a>找到完整列表。</li>
+</ul>
+<h3 id="1-filter"><a href="#1-filter" class="headerlink" title="1.filter():"></a>1.<code>filter()</code>:</h3><p>有时我们想精炼observable发出的数据。就像上面的例子，我们只想发送奇数数字。我们可以使用<code>filter()</code>操作符来实现。</p>
+<p><img src="https://i.loli.net/2020/03/16/S4gEAn8NPu9d3HW.png" alt="1_1FlWy5mNEKsgpzwVDARX6A.png"></p>
+<p>就像名字讲的那样，filter操作符过滤observable发送的项目。你要做的就是告诉操作符，根据情况发送还是不发送对象。</p>
+<pre><code class="java"> Observable
+    .just(1, 2, 3, 4, 5)
+    .filter(new Func1&lt;Integer, Boolean&gt;() {
+        @Override
+        public Boolean call(Integer integer) {
+            //check if the number is odd? If the number is odd return true, to emmit that object.
+            return integer % 2 != 0;
+        }
+    });</code></pre>
+<h3 id="2-skip"><a href="#2-skip" class="headerlink" title="2.skip()"></a>2.<code>skip()</code></h3><p>skip(n)不让Observable发送前面n项，而是发送n后的元素。所以<code>skip(2)</code>会跳过前两个元素，从第三个元素开始发送。</p>
+<p><img src="https://i.loli.net/2020/03/16/ZqGMWXp2sFr5Di6.png" alt="1_hLtkGczgXU4p2kS3LWiAJQ.png"></p>
+<ul>
+<li>还有个操作符<code>skipLast()</code>。这个操作符只会发送数据流中的最后一个元素。</li>
+</ul>
+<pre><code class="java">Observable&lt;Integer&gt; observable = Observable.from(new Integer[]{1,2,3,4,5})  //emit 1 to 5
+        .skip(2);   //Skip first two elements
+
+observable
+        .subscribeOn(Schedulers.newThread())
+        .observeOn(Schedulers.io())
+        .subscribe(new Action1&lt;Integer&gt;() {
+            @Override
+            public void call(Integer integer) {
+                Log.d(&quot;Observer&quot;, &quot;Output:&quot; + integer);
+            }
+        });
+//Output will be : 3, 4, 5</code></pre>
+<h3 id="3-take"><a href="#3-take" class="headerlink" title="3.take()"></a>3.<code>take()</code></h3><p>与<code>skip()</code>相反。</p>
+<p><img src="https://i.loli.net/2020/03/16/2DmBvHSxgRG3lcW.png" alt="1_hxLXh3oxWks8mwwWDmIybg.png"></p>
+<ul>
+<li><code>takeLast()</code></li>
+<li><code>takeFirst()</code></li>
+</ul>
+<h2 id="联合操作符"><a href="#联合操作符" class="headerlink" title="联合操作符"></a>联合操作符</h2><h3 id="1-concat"><a href="#1-concat" class="headerlink" title="1.concat()"></a>1.<code>concat()</code></h3><p><img src="https://i.loli.net/2020/03/19/pqNk5ZR4LotC16r.png" alt="concat _2_.png"></p>
+<pre><code class="java">Observable&lt;Integer&gt; observer1 = Observable.from(new Integer[]{1, 2, 3, 4, 5});  //Emit 1 to 5
+Observable&lt;Integer&gt; observer2 = Observable.from(new Integer[]{6, 7, 8, 9, 10}); //Emit 6 to 10
+
+Observable.concat(observer1, observer2) //Concat the output of both the operators.
+        .subscribeOn(Schedulers.newThread())
+        .observeOn(Schedulers.io())
+        .subscribe(new Action1&lt;Integer&gt;() {
+            @Override
+            public void call(Integer integer) {
+                Log.d(&quot;Observer&quot;, &quot;Output:&quot; + integer);
+            }
+        });</code></pre>
+<h3 id="2-merge"><a href="#2-merge" class="headerlink" title="2.merge()"></a>2.<code>merge()</code></h3><p><img src="https://i.loli.net/2020/03/16/vnU5VjB4Dw1Yi8N.png" alt="1_6S4JWTiEWMOPZjHks3U-cg.png"></p>
+<h3 id="3-zip"><a href="#3-zip" class="headerlink" title="3.zip()"></a>3.<code>zip()</code></h3><p><img src="https://i.loli.net/2020/03/16/jYNxOi9AVK26srd.png" alt="1_egyq-cTJAc6y2G8KvsnAUg.png"></p>
+<pre><code class="java">//Class that combines both data streams
+class ZipObject {
+    int number; 
+    String alphabet;
+}
+
+Observable&lt;Integer&gt; observable1 = Observable.from(new Integer[]{1, 2, 3, 4, 5});  //Emits integers
+Observable&lt;String&gt; observable2 = Observable.from(new String[]{&quot;A&quot;, &quot;B&quot;, &quot;C&quot;, &quot;D&quot;, &quot;F&quot;});  //Emits alphabets
+Observable&lt;ZipObject&gt; observable = Observable.zip(observable1, observable2,   
+    //Function that define how to zip outputs of both the stream into single object.
+    new Func2&lt;Integer, String, ZipObject&gt;() { 
+        @Override
+        public ZipObject call(Integer integer, String s) {
+            ZipObject zipObject = new ZipObject();
+            zipObject.alphabet = s;
+            zipObject.number = integer;
+            return zipObject;
+        }
+    });
+
+observable
+    .subscribeOn(Schedulers.newThread())
+    .observeOn(Schedulers.io())
+    .subscribe(new Action1&lt;ZipObject&gt;() {
+        @Override
+        public void call(ZipObject zipObject) {
+            Log.d(&quot;Observer&quot;, &quot;Output:&quot; + zipObject.number + &quot; &quot; + zipObject.alphabet);
+        }
+    });
+}</code></pre>
+<hr>
+<h1 id="变换"><a href="#变换" class="headerlink" title="变换"></a>变换</h1><h2 id="map"><a href="#map" class="headerlink" title="map()"></a><code>map()</code></h2><h2 id="flatMap"><a href="#flatMap" class="headerlink" title="flatMap()"></a><code>flatMap()</code></h2><p>待</p>
+
+</article>
+
+<div id="paginator">
+  
+</div>
+
+  </div>
+</div>
+
+<div id="bottom-outer">
+    <div id="bottom-inner">
+        Site by Aoyun using
+        <a href="http://hexo.io" target="_blank" rel="noopener">hexo blog framework</a>.
+        <br>
+        <a href="/">Home</a>
+    </div>
+</div> 
+<button class="back-to-top">↑</button>
+
+<!-- 引入 JS -->
+<script src="https://ajax.aspnetcdn.com/ajax/jquery/jquery-1.9.0.min.js"></script>
+
+  <!-- scripts list from theme config.yml -->
+  
+    <script src="/js/noise.js"></script>
+  
+    <script src="/lib/highlight/highlight.pack.js"></script>
+  
+
+
+<script>hljs.initHighlightingOnLoad();</script>
+
+</body>
+</html>

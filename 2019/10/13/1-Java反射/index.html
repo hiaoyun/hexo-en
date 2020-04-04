@@ -1,0 +1,205 @@
+
+
+
+<!DOCTYPE html>
+<html lang="en,zh-CN,ja,default">
+<head>
+  <meta charset="UTF-8">
+  <title>1-Java反射 [ hiaoyun-en ]</title>
+  
+  
+    <!-- stylesheets list from _config.yml -->
+    
+      <!-- 引入 CSS -->
+      <link rel="stylesheet" href="/css/noise.css">
+    
+      <!-- 引入 CSS -->
+      <link rel="stylesheet" href="/lib/fontawesome-free-5.11.2-web/css/all.css">
+    
+      <!-- 引入 CSS -->
+      <link rel="stylesheet" href="/lib/highlight/styles/atom-one-dark.css">
+    
+  
+<meta name="generator" content="Hexo 4.2.0"></head>
+<body>
+
+<!-- 引入导航菜单 -->
+ 
+<!-- 导航菜单 -->
+<div id="menu-outer">
+    <div id="menu-inner">
+        
+        <span id="menu-link-icon">
+            <a href="/">Home</a>
+        </span>
+        
+        <span id="menu-link-icon">
+            <a href="/archives">Archives</a>
+        </span>
+        
+        <span id="menu-link-icon">
+            <a href="/about">About</a>
+        </span>
+        
+    </div>
+</div>
+ 
+
+<div id="content-outer">
+  <div id="content-inner">
+     
+<article id="post">
+  <h1>1-Java反射</h1>
+  <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>这是打算认真写博客后的第一篇，今天来研究一下Java的反射机制。</p>
+<h2 id="反射简介"><a href="#反射简介" class="headerlink" title="反射简介"></a>反射简介</h2><p>反射机制可以让人们在运行时获得类的信息。</p>
+<p><code>Class</code>类和<code>java.lang.reflect</code>类库（包含<code>Constructor</code> <code>Method</code> <code>Field</code> <code>Modifier</code> <code>Array</code>类）为反射提供了支持。</p>
+<a id="more"></a>
+
+<h2 id="Class对象"><a href="#Class对象" class="headerlink" title="Class对象"></a><code>Class</code>对象</h2><h3 id="获得Class对象"><a href="#获得Class对象" class="headerlink" title="获得Class对象"></a>获得<code>Class</code>对象</h3><pre><code class="java">// 第1种方法
+Class clazz0 = String.class;
+
+// 第2种方法
+Example example = new Example();
+Class clazz1 = example.getClass();
+
+// 第3种方法
+// ! java.lang.ClassNotFoundException
+Class clazz2 =  Class.forName(&quot;com.example.Example&quot;);</code></pre>
+<h3 id="Class对象相关操作"><a href="#Class对象相关操作" class="headerlink" title="Class对象相关操作"></a><code>Class</code>对象相关操作</h3><h4 id="部分方法"><a href="#部分方法" class="headerlink" title="部分方法:"></a>部分方法:</h4><p>从名字就大概知道作用了。</p>
+<ul>
+<li><code>getPackage()</code></li>
+<li><code>getName()</code></li>
+<li><code>getSuperClass()</code></li>
+<li><code>getInterface()</code></li>
+<li><code>getModifier()</code></li>
+<li><code>getConstructors()</code></li>
+<li><code>getMethods()</code></li>
+<li><code>getFields()</code></li>
+<li><code>getAnnotations()</code> </li>
+<li><code>getClasses()</code> // 获得内部类</li>
+<li><code>getDeclaringClass()</code> // 如果该类为内部类，获得对应外部类，否则返回<code>null</code></li>
+<li>…</li>
+</ul>
+<blockquote>
+<p>没有<code>setAccessible(...)</code></p>
+<p>完整方法见<a href="https://docs.oracle.com/javase/10/docs/api/index.html?overview-summary.html" target="_blank" rel="noopener">Java 文档</a></p>
+</blockquote>
+<h2 id="解析Modifier类"><a href="#解析Modifier类" class="headerlink" title="解析Modifier类"></a>解析<code>Modifier</code>类</h2><h3 id="常用静态方法："><a href="#常用静态方法：" class="headerlink" title="常用静态方法："></a>常用静态方法：</h3><ul>
+<li><code>isPublic(int mod)</code></li>
+<li>…</li>
+<li>…</li>
+<li><code>isStatic(int mod)</code></li>
+<li><code>isFinal(int mod)</code></li>
+<li><code>toString(int mod)</code> // 以字符串的形式返回所有修饰符</li>
+</ul>
+<h2 id="变量"><a href="#变量" class="headerlink" title="变量"></a>变量</h2><h3 id="获得Field对象"><a href="#获得Field对象" class="headerlink" title="获得Field对象"></a>获得<code>Field</code>对象</h3><p>通过上面获得的<code>Class</code>对象获得（成员/实例/对象）变量。</p>
+<pre><code class="java">// 获得所有（包括父类）的public的成员变量
+Field[] fields1 = clazz.getFields();
+
+// 获得指定名称的成员变量
+Field field1 = clazz.getField(&quot;mField&quot;);
+
+// 获得所有权限（不包括父类）的成员变量
+Field[] fields2 = clazz.getDeclaredFields();
+
+// 获得指定名称的成员变量
+Field field2 = clazz.getDeclaredField(&quot;mField&quot;);</code></pre>
+<h3 id="Field对象相关操作"><a href="#Field对象相关操作" class="headerlink" title="Field对象相关操作"></a><code>Field</code>对象相关操作</h3><h4 id="部分方法："><a href="#部分方法：" class="headerlink" title="部分方法："></a>部分方法：</h4><ul>
+<li><code>set(Object obj, Object value)</code></li>
+<li><code>getBoolean(Object obj)</code></li>
+<li><code>setBoolean(Object obj, boolean z)</code> // 通过此方法设置<code>field</code>的值</li>
+<li>…</li>
+<li><code>getName()</code></li>
+<li><code>getType()</code> // 获得该<code>field</code>的<code>Class</code>对象</li>
+<li><code>setAccessible(Boolean flag)</code> // <code>private</code>的成员变量设置为<code>true</code>后才可访问</li>
+<li><code>getModifiers()</code> // 获得该 <code>field</code>的控制符(<code>private</code> <code>static</code>…)对应的整数</li>
+</ul>
+<h2 id="方法"><a href="#方法" class="headerlink" title="方法"></a>方法</h2><h3 id="获得Method对象"><a href="#获得Method对象" class="headerlink" title="获得Method对象"></a>获得<code>Method</code>对象</h3><p>和获得<code>Field</code>对象类似，只要把”Field”改为”Method”。</p>
+<pre><code class="java">// 通过方法的参数类型获得
+Method method = clazz.getMethod(String.class,int.class);
+// 或
+Method method = clazz.getMethod(new Class[]{String.class, int.class})
+
+// getDeclaredMethod(Class&lt;?&gt; parameterTypes)同上</code></pre>
+<h3 id="Method对象相关操作"><a href="#Method对象相关操作" class="headerlink" title="Method对象相关操作"></a>Method对象相关操作</h3><h4 id="部分方法：-1"><a href="#部分方法：-1" class="headerlink" title="部分方法："></a>部分方法：</h4><ul>
+<li><code>getName()</code></li>
+<li><code>getParameterTypes()</code> // 返回值<code>Class[]</code>形式</li>
+<li><code>getReturnType()</code></li>
+<li><code>getExceptionTypes()</code></li>
+<li><code>isVarArgs()</code> // 是否是可变参数类型</li>
+<li><code>getModifier()</code></li>
+<li><code>setAccessible(Boolean flag)</code></li>
+<li><code>invoke(Object obj, Object... args)</code> // 调用<code>obj</code>的此方法，<code>args</code>为参数</li>
+</ul>
+<h2 id="构造方法"><a href="#构造方法" class="headerlink" title="构造方法"></a>构造方法</h2><h3 id="获得Constructor对象"><a href="#获得Constructor对象" class="headerlink" title="获得Constructor对象"></a>获得<code>Constructor</code>对象</h3><p>和获得<code>Method</code>对象类似，只要把”Method”改为”Constructor”。</p>
+<h3 id="Constructor对象相关操作"><a href="#Constructor对象相关操作" class="headerlink" title="Constructor对象相关操作"></a><code>Constructor</code>对象相关操作</h3><h4 id="部分方法：-2"><a href="#部分方法：-2" class="headerlink" title="部分方法："></a>部分方法：</h4><ul>
+<li><code>newInstance(Object... initargs)</code>  // 通过指定参数创建类的实例，参数未设置则采用默认构造方法</li>
+</ul>
+<p>其他和<code>Method</code>一样。</p>
+<h2 id="操作私有变量和私有方法"><a href="#操作私有变量和私有方法" class="headerlink" title="操作私有变量和私有方法"></a>操作私有变量和私有方法</h2><p>我们都知道是无法<strong>直接</strong>对私有变量和私有方法进行操作的，但通过反射，即先用<code>getDeclaredXXX()</code>获得所有权限（不包括父类）的<code>XXX</code>，再<code>setAccessible(true)</code>就可以操作了。</p>
+<h2 id="使用Array"><a href="#使用Array" class="headerlink" title="使用Array"></a>使用<code>Array</code></h2><p>简单示例：</p>
+<pre><code class="java">Class cls = Class.forName(&quot;java.lang.String&quot;);
+// 创建10个类型为cls的对象
+// 还可以传入可变参数为维度
+Object arr = Array.newInstance(cls, 10);
+// 设置第5个对象的内容
+Array.set(arr, 5, &quot;this is a test&quot;);
+String s = (String)Array.get(arr, 5);
+System.out.println(s);</code></pre>
+<h2 id="Executable"><a href="#Executable" class="headerlink" title="Executable"></a><code>Executable</code></h2><p>1.8之后新增的，为<code>Constructor</code>和<code>Method</code>共用的父类，定义了TA们共有的功能。</p>
+<ul>
+<li><code>getParameters()</code></li>
+<li>…</li>
+</ul>
+<h2 id="Parameter"><a href="#Parameter" class="headerlink" title="Parameter"></a><code>Parameter</code></h2><p>1.8之后新增的，保存了关于方法参数的信息。</p>
+<h2 id="反射效率"><a href="#反射效率" class="headerlink" title="反射效率"></a>反射效率</h2><h2 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h2><h3 id="修改常量"><a href="#修改常量" class="headerlink" title="修改常量"></a>修改常量</h3><p>常量在Java中用<code>final</code>修饰。而为了提高执行效率，编译器在把<code>.java</code>文件编译成<code>.class</code>文件时，一般会把<code>int</code> <code>long</code> <code>boolean</code>等基本数据类型和<code>String</code>类的常量替换成对应的常量值。Java虚拟机执行的是<code>.class</code>文件，所以在程序执行时编码中常量的<strong>使用</strong>位置已经是直接的值了。因此虽然常量值可以被修改，但已经没有TA发挥作用的位置了。</p>
+<p>其实仍要修改还是有可能的，那就是常量没有被换成值的情况<del>，但貌似比较傻</del>。</p>
+<p>情况举例：</p>
+<ul>
+<li><pre><code class="java">  // 常量通过如下方法赋值
+  private final String FINAL_VALUE = null == null ? &quot;FINAL&quot; : null;</code></pre>
+</li>
+<li><p><code>final</code>常量在构造函数中赋值。</p>
+</li>
+</ul>
+<blockquote>
+<p> 参考了<a href="https://juejin.im/post/598ea9116fb9a03c335a99a4#heading-7" target="_blank" rel="noopener">这篇文章</a></p>
+</blockquote>
+<h3 id="反射的有趣应用"><a href="#反射的有趣应用" class="headerlink" title="反射的有趣应用"></a>反射的有趣应用</h3><p>可以看下<a href="https://www.imooc.com/article/71970" target="_blank" rel="noopener">这篇文章</a>，不过<code>new Integer(1)</code>已经被废弃了，可以用<code>setInt(Object obj, int i)</code>代替<code>set()</code>。</p>
+<p>完。</p>
+<p>2019-10-13 18:28:56</p>
+
+</article>
+
+<div id="paginator">
+  
+</div>
+
+  </div>
+</div>
+
+<div id="bottom-outer">
+    <div id="bottom-inner">
+        Site by Aoyun using
+        <a href="http://hexo.io" target="_blank" rel="noopener">hexo blog framework</a>.
+        <br>
+        <a href="/">Home</a>
+    </div>
+</div> 
+<button class="back-to-top">↑</button>
+
+<!-- 引入 JS -->
+<script src="https://ajax.aspnetcdn.com/ajax/jquery/jquery-1.9.0.min.js"></script>
+
+  <!-- scripts list from theme config.yml -->
+  
+    <script src="/js/noise.js"></script>
+  
+    <script src="/lib/highlight/highlight.pack.js"></script>
+  
+
+
+<script>hljs.initHighlightingOnLoad();</script>
+
+</body>
+</html>

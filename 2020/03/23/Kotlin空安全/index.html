@@ -1,0 +1,121 @@
+
+
+
+<!DOCTYPE html>
+<html lang="en,zh-CN,ja,default">
+<head>
+  <meta charset="UTF-8">
+  <title>Kotlin空安全 [ hiaoyun-en ]</title>
+  
+  
+    <!-- stylesheets list from _config.yml -->
+    
+      <!-- 引入 CSS -->
+      <link rel="stylesheet" href="/css/noise.css">
+    
+      <!-- 引入 CSS -->
+      <link rel="stylesheet" href="/lib/fontawesome-free-5.11.2-web/css/all.css">
+    
+      <!-- 引入 CSS -->
+      <link rel="stylesheet" href="/lib/highlight/styles/atom-one-dark.css">
+    
+  
+<meta name="generator" content="Hexo 4.2.0"></head>
+<body>
+
+<!-- 引入导航菜单 -->
+ 
+<!-- 导航菜单 -->
+<div id="menu-outer">
+    <div id="menu-inner">
+        
+        <span id="menu-link-icon">
+            <a href="/">Home</a>
+        </span>
+        
+        <span id="menu-link-icon">
+            <a href="/archives">Archives</a>
+        </span>
+        
+        <span id="menu-link-icon">
+            <a href="/about">About</a>
+        </span>
+        
+    </div>
+</div>
+ 
+
+<div id="content-outer">
+  <div id="content-inner">
+     
+<article id="post">
+  <h1>Kotlin空安全</h1>
+  <h2 id="可空类型"><a href="#可空类型" class="headerlink" title="可空类型"></a>可空类型</h2><p>声明为可空类型：</p>
+<pre><code class="kotlin">var s: String? = null</code></pre>
+<a id="more"></a>
+
+<h2 id="使用可空对象"><a href="#使用可空对象" class="headerlink" title="使用可空对象"></a>使用可空对象</h2><h3 id="进行-null-检测"><a href="#进行-null-检测" class="headerlink" title="进行 null 检测"></a>进行 <code>null</code> 检测</h3><pre><code class="kotlin">if (s != null) {
+    print(s.length())
+}</code></pre>
+<p> 在经过<code>null</code>检测后，会自动转为<code>非null</code>对象。</p>
+<h3 id="使用-操作符"><a href="#使用-操作符" class="headerlink" title="使用?.操作符"></a>使用<code>?.</code>操作符</h3><pre><code class="kotlin">print(s?.length)</code></pre>
+<p>如果<code>非null</code>，则会计算s.length。如果为<code>null</code>，则返回<code>null</code>，不会报<code>NullPointerException</code>。</p>
+<p>可以链式调用：</p>
+<pre><code class="kotlin">response?.body()?.string()</code></pre>
+<p>配合<code>let</code>：</p>
+<pre><code class="kotlin">val listWithNulls: List&lt;String?&gt; = listOf(&quot;Kotlin&quot;, null)
+for (item in listWithNulls) {
+    item?.let { println(it) } // 输出 Kotlin 并忽略 null
+}</code></pre>
+<p> 安全调用也可以出现在赋值的左边，如果为<code>null</code>，则不会赋值，右边也不会求值。</p>
+<h3 id="Elvis-操作符"><a href="#Elvis-操作符" class="headerlink" title="Elvis 操作符"></a>Elvis 操作符</h3><pre><code class="kotlin">val l = b?.length ?: -1</code></pre>
+<p>意思是如果<code>b != null</code>，求<code>b.length</code>，否则返回<code>-1</code>。当前仅当左侧为空时，才会对右侧求值。</p>
+<h3 id="操作符"><a href="#操作符" class="headerlink" title="!! 操作符"></a>!! 操作符</h3><pre><code class="kotlin">val l = b!!.length</code></pre>
+<p>使用<code>!!</code> 操作符意味着不再进行<code>null</code>检查，因此可能会<code>NPE</code>。</p>
+<h2 id="类型转换"><a href="#类型转换" class="headerlink" title="类型转换"></a>类型转换</h2><pre><code class="kotlin">val aInt: Int? = a as? Int</code></pre>
+<p>这里如果<code>a</code>不是<code>Int</code>类型，则会返回<code>null</code>。使用<code>as?</code>可以避免<code>ClassCastException</code>。</p>
+<h2 id="使用-filterNotNull"><a href="#使用-filterNotNull" class="headerlink" title="使用 filterNotNull()"></a>使用 <code>filterNotNull()</code></h2><pre><code class="kotlin">val nullableList: List&lt;Int?&gt; = listOf(1, 2, null, 4)
+val intList: List&lt;Int&gt; = nullableList.filterNotNull()</code></pre>
+<p>会把<code>非null</code>对象过滤出来。</p>
+<h2 id="还有可能-NPE-的情况"><a href="#还有可能-NPE-的情况" class="headerlink" title="还有可能 NPE 的情况"></a>还有可能 <code>NPE</code> 的情况</h2><p>显示调用 <code>throw NullPointerException()</code>；</p>
+<p>使用了 <code>!!</code>操作符；</p>
+<p>与 Java 进行了互操作：</p>
+<p>如 Java 调用 Kotlin 时传进了<code>null</code> 、如 Kotlin 调用 Java 时无法进行类型推断等；</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://www.kotlincn.net/docs/reference/null-safety.html" target="_blank" rel="noopener">空安全 - Kotlin 语言中文站</a></p>
+<p><a href="https://www.jianshu.com/p/d55881a9380e" target="_blank" rel="noopener">Kotlin基本语法之(五)类型与空安全 - 简书</a></p>
+<p>2020-3-23 20:53:41</p>
+
+</article>
+
+<div id="paginator">
+  
+</div>
+
+  </div>
+</div>
+
+<div id="bottom-outer">
+    <div id="bottom-inner">
+        Site by Aoyun using
+        <a href="http://hexo.io" target="_blank" rel="noopener">hexo blog framework</a>.
+        <br>
+        <a href="/">Home</a>
+    </div>
+</div> 
+<button class="back-to-top">↑</button>
+
+<!-- 引入 JS -->
+<script src="https://ajax.aspnetcdn.com/ajax/jquery/jquery-1.9.0.min.js"></script>
+
+  <!-- scripts list from theme config.yml -->
+  
+    <script src="/js/noise.js"></script>
+  
+    <script src="/lib/highlight/highlight.pack.js"></script>
+  
+
+
+<script>hljs.initHighlightingOnLoad();</script>
+
+</body>
+</html>

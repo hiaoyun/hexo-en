@@ -1,0 +1,150 @@
+
+
+
+<!DOCTYPE html>
+<html lang="en,zh-CN,ja,default">
+<head>
+  <meta charset="UTF-8">
+  <title>文档补完-Android Plugin DSL [ hiaoyun-en ]</title>
+  
+  
+    <!-- stylesheets list from _config.yml -->
+    
+      <!-- 引入 CSS -->
+      <link rel="stylesheet" href="/css/noise.css">
+    
+      <!-- 引入 CSS -->
+      <link rel="stylesheet" href="/lib/fontawesome-free-5.11.2-web/css/all.css">
+    
+      <!-- 引入 CSS -->
+      <link rel="stylesheet" href="/lib/highlight/styles/atom-one-dark.css">
+    
+  
+<meta name="generator" content="Hexo 4.2.0"></head>
+<body>
+
+<!-- 引入导航菜单 -->
+ 
+<!-- 导航菜单 -->
+<div id="menu-outer">
+    <div id="menu-inner">
+        
+        <span id="menu-link-icon">
+            <a href="/">Home</a>
+        </span>
+        
+        <span id="menu-link-icon">
+            <a href="/archives">Archives</a>
+        </span>
+        
+        <span id="menu-link-icon">
+            <a href="/about">About</a>
+        </span>
+        
+    </div>
+</div>
+ 
+
+<div id="content-outer">
+  <div id="content-inner">
+     
+<article id="post">
+  <h1>文档补完-Android Plugin DSL</h1>
+  <p><a href="http://google.github.io/android-gradle-dsl/current/index.html" target="_blank" rel="noopener">Android Plugin 3.4.0-dev DSL Reference</a></p>
+<a id="more"></a>
+
+<pre><code class="groovy">apply plugin: &#39;com.android.application&#39;
+apply plugin: &#39;kotlin-android&#39;
+apply plugin: &#39;kotlin-android-extensions&#39;
+
+android {
+    compileSdkVersion 29
+    buildToolsVersion &quot;29.0.2&quot;
+
+    defaultConfig {
+        applicationId &quot;me.aoyun.customfancontroller&quot;
+        minSdkVersion 19
+        targetSdkVersion 29
+        versionCode 1
+        versionName &quot;1.0&quot;
+
+        testInstrumentationRunner &quot;androidx.test.runner.AndroidJUnitRunner&quot;
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile(&#39;proguard-android-optimize.txt&#39;), &#39;proguard-rules.pro&#39;
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    kotlinOptions {
+        jvmTarget = JavaVersion.VERSION_1_8.toString()
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: &#39;libs&#39;, include: [&#39;*.jar&#39;])
+    implementation &quot;org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version&quot;
+    implementation &#39;androidx.appcompat:appcompat:1.1.0&#39;
+    implementation &#39;androidx.core:core-ktx:1.2.0&#39;
+    implementation &#39;androidx.constraintlayout:constraintlayout:1.1.3&#39;
+    testImplementation &#39;junit:junit:4.12&#39;
+    androidTestImplementation &#39;androidx.test.ext:junit:1.1.1&#39;
+    androidTestImplementation &#39;androidx.test.espresso:espresso-core:3.2.0&#39;
+}</code></pre>
+<h2 id="defaultConfig"><a href="#defaultConfig" class="headerlink" title="defaultConfig{}"></a>defaultConfig{}</h2><p>指定编译构建变体的默认变体。</p>
+<p><code>testInstrumentationRunner</code> Test instrumentation runner 类名。</p>
+<h2 id="buildType"><a href="#buildType" class="headerlink" title="buildType{}"></a>buildType{}</h2><p>配置构建类型。</p>
+<p><code>minifyEnabled</code> 是否移除未使用的 Java 代码。</p>
+<p><code>proguardFiles</code> 指定 plugin 应该使用的混淆文件。</p>
+<h2 id="compileOptions"><a href="#compileOptions" class="headerlink" title="compileOptions{}"></a>compileOptions{}</h2><p><code>sourceCompatibility</code> Java 源代码的语言版本。</p>
+<p>支持的格式：</p>
+<ul>
+<li><code>&quot;1.6&quot;</code></li>
+<li><code>1.6</code></li>
+<li><code>JavaVersion.Version_1_6</code></li>
+<li><code>&quot;Version_1_6&quot;</code></li>
+</ul>
+<p><code>targetCompatibility</code>  生成的字节码的版本。</p>
+<p>支持格式同上。</p>
+
+</article>
+
+<div id="paginator">
+  
+</div>
+
+  </div>
+</div>
+
+<div id="bottom-outer">
+    <div id="bottom-inner">
+        Site by Aoyun using
+        <a href="http://hexo.io" target="_blank" rel="noopener">hexo blog framework</a>.
+        <br>
+        <a href="/">Home</a>
+    </div>
+</div> 
+<button class="back-to-top">↑</button>
+
+<!-- 引入 JS -->
+<script src="https://ajax.aspnetcdn.com/ajax/jquery/jquery-1.9.0.min.js"></script>
+
+  <!-- scripts list from theme config.yml -->
+  
+    <script src="/js/noise.js"></script>
+  
+    <script src="/lib/highlight/highlight.pack.js"></script>
+  
+
+
+<script>hljs.initHighlightingOnLoad();</script>
+
+</body>
+</html>

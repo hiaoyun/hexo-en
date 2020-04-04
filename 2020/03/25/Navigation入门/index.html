@@ -1,0 +1,143 @@
+
+
+
+<!DOCTYPE html>
+<html lang="en,zh-CN,ja,default">
+<head>
+  <meta charset="UTF-8">
+  <title>Navigation入门 [ hiaoyun-en ]</title>
+  
+  
+    <!-- stylesheets list from _config.yml -->
+    
+      <!-- 引入 CSS -->
+      <link rel="stylesheet" href="/css/noise.css">
+    
+      <!-- 引入 CSS -->
+      <link rel="stylesheet" href="/lib/fontawesome-free-5.11.2-web/css/all.css">
+    
+      <!-- 引入 CSS -->
+      <link rel="stylesheet" href="/lib/highlight/styles/atom-one-dark.css">
+    
+  
+<meta name="generator" content="Hexo 4.2.0"></head>
+<body>
+
+<!-- 引入导航菜单 -->
+ 
+<!-- 导航菜单 -->
+<div id="menu-outer">
+    <div id="menu-inner">
+        
+        <span id="menu-link-icon">
+            <a href="/">Home</a>
+        </span>
+        
+        <span id="menu-link-icon">
+            <a href="/archives">Archives</a>
+        </span>
+        
+        <span id="menu-link-icon">
+            <a href="/about">About</a>
+        </span>
+        
+    </div>
+</div>
+ 
+
+<div id="content-outer">
+  <div id="content-inner">
+     
+<article id="post">
+  <h1>Navigation入门</h1>
+  <p>Navigation 组件有下面3个关键部分组成：</p>
+<p>Navigation Graph XML resource 包含与navigation有关的所有信息，如destination path等。</p>
+<p>NavHostFragment Layout XML 添加到layout的widget，显示了Navigation Graph的destination。</p>
+<p>NavController Kotlin/Java 对象 追踪在 Navigation Graph 中的位置，协调那些destination。</p>
+<a id="more"></a>
+
+<p>Destinations</p>
+<p>destination 是在app中可以导航到的地方，一般是fragment或activity。</p>
+<p>一般来说，fragment作为destination。</p>
+<p>Navigation Graph</p>
+<p>NavController 此类用于控制在NavHostFragment中fragment的切换</p>
+<pre><code class="kotlin">Fragment.findNavController()
+View.findNavController()
+Activity.findNavController(viewId: Int)</code></pre>
+<pre><code class="kotlin">val button = view.findViewById&lt;Button&gt;(R.id.navigate_destination_button)
+button?.setOnClickListener(
+        Navigation.createNavigateOnClickListener(R.id.flow_step_one_dest, null)
+)</code></pre>
+<pre><code class="kotlin">// Note the usage of curly braces since we are defining the click listener lambda
+view.findViewById&lt;Button&gt;(R.id.navigate_action_button)?.setOnClickListener {
+    val flowStepNumberArg = 1
+    val action = HomeFragmentDirections.nextAction(flowStepNumberArg)
+    findNavController().navigate(action)
+}</code></pre>
+<h2 id="更多-Navigation"><a href="#更多-Navigation" class="headerlink" title="更多 Navigation"></a>更多 Navigation</h2><h3 id="menu"><a href="#menu" class="headerlink" title="menu"></a>menu</h3><h3 id="drawer"><a href="#drawer" class="headerlink" title="drawer"></a>drawer</h3><h3 id="bottom"><a href="#bottom" class="headerlink" title="bottom"></a>bottom</h3><h2 id="DeepLink"><a href="#DeepLink" class="headerlink" title="DeepLink"></a>DeepLink</h2><pre><code class="kotlin">val args = Bundle()
+args.putString(&quot;myarg&quot;, &quot;From Widget&quot;);
+val pendingIntent = NavDeepLinkBuilder(context)
+        .setGraph(R.navigation.mobile_navigation)
+        .setDestination(R.id.deeplink_dest)
+        .setArguments(args)
+        .createPendingIntent()
+
+remoteViews.setOnClickPendingIntent(R.id.deep_link_button, pendingIntent)</code></pre>
+<h3 id="backstack"><a href="#backstack" class="headerlink" title="backstack"></a>backstack</h3><h2 id="Web-Link-with-Destination"><a href="#Web-Link-with-Destination" class="headerlink" title="Web Link with Destination"></a>Web Link with Destination</h2><pre><code class="xml">&lt;fragment
+    android:id=&quot;@+id/deeplink_dest&quot;
+    android:name=&quot;com.example.android.codelabs.navigation.DeepLinkFragment&quot;
+    android:label=&quot;@string/deeplink&quot;
+    tools:layout=&quot;@layout/deeplink_fragment&quot;&gt;
+
+    &lt;argument
+        android:name=&quot;myarg&quot;
+        android:defaultValue=&quot;Android!&quot;/&gt;
+
+    &lt;deepLink app:uri=&quot;www.example.com/{myarg}&quot; /&gt;
+&lt;/fragment&gt;</code></pre>
+<pre><code class="xml">&lt;activity android:name=&quot;.MainActivity&quot;&gt;
+    &lt;intent-filter&gt;
+        &lt;action android:name=&quot;android.intent.action.MAIN&quot; /&gt;
+        &lt;category android:name=&quot;android.intent.category.DEFAULT&quot; /&gt;
+        &lt;category android:name=&quot;android.intent.category.LAUNCHER&quot; /&gt;
+    &lt;/intent-filter&gt;
+
+    &lt;nav-graph android:value=&quot;@navigation/mobile_navigation&quot; /&gt;
+&lt;/activity&gt;</code></pre>
+<p>待</p>
+<p>2020-3-25 23:11:39</p>
+
+</article>
+
+<div id="paginator">
+  
+</div>
+
+  </div>
+</div>
+
+<div id="bottom-outer">
+    <div id="bottom-inner">
+        Site by Aoyun using
+        <a href="http://hexo.io" target="_blank" rel="noopener">hexo blog framework</a>.
+        <br>
+        <a href="/">Home</a>
+    </div>
+</div> 
+<button class="back-to-top">↑</button>
+
+<!-- 引入 JS -->
+<script src="https://ajax.aspnetcdn.com/ajax/jquery/jquery-1.9.0.min.js"></script>
+
+  <!-- scripts list from theme config.yml -->
+  
+    <script src="/js/noise.js"></script>
+  
+    <script src="/lib/highlight/highlight.pack.js"></script>
+  
+
+
+<script>hljs.initHighlightingOnLoad();</script>
+
+</body>
+</html>

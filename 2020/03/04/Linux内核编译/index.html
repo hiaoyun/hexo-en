@@ -1,0 +1,123 @@
+
+
+
+<!DOCTYPE html>
+<html lang="en,zh-CN,ja,default">
+<head>
+  <meta charset="UTF-8">
+  <title>Linux内核编译 [ hiaoyun-en ]</title>
+  
+  
+    <!-- stylesheets list from _config.yml -->
+    
+      <!-- 引入 CSS -->
+      <link rel="stylesheet" href="/css/noise.css">
+    
+      <!-- 引入 CSS -->
+      <link rel="stylesheet" href="/lib/fontawesome-free-5.11.2-web/css/all.css">
+    
+      <!-- 引入 CSS -->
+      <link rel="stylesheet" href="/lib/highlight/styles/atom-one-dark.css">
+    
+  
+<meta name="generator" content="Hexo 4.2.0"></head>
+<body>
+
+<!-- 引入导航菜单 -->
+ 
+<!-- 导航菜单 -->
+<div id="menu-outer">
+    <div id="menu-inner">
+        
+        <span id="menu-link-icon">
+            <a href="/">Home</a>
+        </span>
+        
+        <span id="menu-link-icon">
+            <a href="/archives">Archives</a>
+        </span>
+        
+        <span id="menu-link-icon">
+            <a href="/about">About</a>
+        </span>
+        
+    </div>
+</div>
+ 
+
+<div id="content-outer">
+  <div id="content-inner">
+     
+<article id="post">
+  <h1>Linux内核编译</h1>
+  <h2 id="写在前面"><a href="#写在前面" class="headerlink" title="写在前面"></a>写在前面</h2><p><code>make</code>这一阶段花费时间和机器配置有关，可能长达几小时，建议选择好时间。同时需要足够的磁盘空间，22G以上。</p>
+<p>环境：Ubuntu 18.04.1 阿里云服务器</p>
+<a id="more"></a>
+
+<h2 id="查看现在的内核版本"><a href="#查看现在的内核版本" class="headerlink" title="查看现在的内核版本"></a>查看现在的内核版本</h2><pre><code class="bash">cat /proc/version</code></pre>
+<p><img src="https://i.loli.net/2020/03/03/u7qG6akKOdEJAjY.png" alt="DeepinScreenshot_select-area_20200303234804.png"></p>
+<p>可以看到内核版本为4.15.0</p>
+<h2 id="下载Linux内核源代码文件"><a href="#下载Linux内核源代码文件" class="headerlink" title="下载Linux内核源代码文件"></a>下载Linux内核源代码文件</h2><p><a href="https://www.kernel.org/" target="_blank" rel="noopener">https://www.kernel.org/</a></p>
+<p>可以使用国内镜像 <a href="https://mirrors.tuna.tsinghua.edu.cn/kernel/" target="_blank" rel="noopener">https://mirrors.tuna.tsinghua.edu.cn/kernel/</a> </p>
+<p><img src="https://i.loli.net/2020/03/03/OsvJ4ZxRTQC5hfb.png" alt="DeepinScreenshot_20200303233752.png"></p>
+<pre><code class="bash">wget https://mirror.tuna.tsinghua.edu.cn/kernel/v4.x/linux-4.15.1.tar.gz</code></pre>
+<h2 id="解压"><a href="#解压" class="headerlink" title="解压"></a>解压</h2><pre><code class="sh">tar -xavf linux-4.15.1.tar.gz</code></pre>
+<h2 id="安装编译依赖"><a href="#安装编译依赖" class="headerlink" title="安装编译依赖"></a>安装编译依赖</h2><pre><code class="bash">apt-get install gcc make libncurses5-dev openssl libssl-dev build-essential pkg-config libc6-dev bison flex libelf-dev</code></pre>
+<h2 id="编译前配置"><a href="#编译前配置" class="headerlink" title="编译前配置"></a>编译前配置</h2><p>在解压后的目录下执行</p>
+<pre><code class="sh">make menuconfig</code></pre>
+<p><img src="https://i.loli.net/2020/03/04/wiKPqDnRcmsSNjU.png" alt="DeepinScreenshot_20200303202045.png">进行配置，可以直接保存退出。</p>
+<h2 id="编译"><a href="#编译" class="headerlink" title="编译"></a>编译</h2><pre><code class="sh">make</code></pre>
+<p><img src="https://i.loli.net/2020/03/04/E5YMrg68tbHDPVa.png" alt="image.png"></p>
+<p>耗时可能较长。</p>
+<p>编译完成：</p>
+<p><del>突然结束，也没什么提示</del></p>
+<p><img src="https://i.loli.net/2020/03/04/vFpWuOLwlPsKzCy.png" alt="image-20200304093348825"></p>
+<h2 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h2><p>安装内核模块，<code>root</code>下执行</p>
+<pre><code class="sh">make modules_install</code></pre>
+<p><img src="https://i.loli.net/2020/03/04/woCOAyVPYmfLb6Q.png" alt="image-20200304093929366"></p>
+<p>安装内核，<code>root</code>下执行</p>
+<pre><code class="sh">make install</code></pre>
+<p><img src="https://i.loli.net/2020/03/04/q3S6aBxQVp9tlDM.png" alt="image.png"></p>
+<p>安装完成：</p>
+<p><img src="https://i.loli.net/2020/03/04/oCKl754jgXtIGaE.png" alt="image-20200304094140351"></p>
+<h2 id="检验成果"><a href="#检验成果" class="headerlink" title="检验成果"></a>检验成果</h2><pre><code class="sh">reboot</code></pre>
+<pre><code class="sh">cat /proc/version</code></pre>
+<p><img src="https://i.loli.net/2020/03/04/9XFm6pB3dQSrhj2.png" alt="DeepinScreenshot_select-area_20200304094419.png"></p>
+<p>可以看到内核已经是4.15.1了，刚才编译的。</p>
+<p>完。</p>
+<p>2020-3-3 23:30</p>
+
+</article>
+
+<div id="paginator">
+  
+</div>
+
+  </div>
+</div>
+
+<div id="bottom-outer">
+    <div id="bottom-inner">
+        Site by Aoyun using
+        <a href="http://hexo.io" target="_blank" rel="noopener">hexo blog framework</a>.
+        <br>
+        <a href="/">Home</a>
+    </div>
+</div> 
+<button class="back-to-top">↑</button>
+
+<!-- 引入 JS -->
+<script src="https://ajax.aspnetcdn.com/ajax/jquery/jquery-1.9.0.min.js"></script>
+
+  <!-- scripts list from theme config.yml -->
+  
+    <script src="/js/noise.js"></script>
+  
+    <script src="/lib/highlight/highlight.pack.js"></script>
+  
+
+
+<script>hljs.initHighlightingOnLoad();</script>
+
+</body>
+</html>

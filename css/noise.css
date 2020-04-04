@@ -1,0 +1,45 @@
+html {
+  max-width: 700px;
+  margin: auto;
+}
+#menu-link-icon {
+  width: 150px;
+}
+a {
+  text-decoration: none;
+  color: #0e83cd;
+}
+a:hover {
+  text-decoration: underline;
+}
+#bottom-outer {
+  position: relative;
+  bottom: 0px;
+}
+.time {
+  float: right;
+}
+#menu-outer {
+  float: top;
+}
+#bottom-outer {
+  float: bottom;
+}
+img {
+  width: 100%;
+}
+code {
+  background: #dcdcdc;
+  border-radius: 2px;
+  padding: 2px;
+  margin: 3px;
+}
+.back-to-top {
+  width: 40px;
+  height: 40px;
+  font-size: 30px;
+  position: fixed;
+  right: 30px;
+  bottom: 30px;
+  border: 0px;
+}

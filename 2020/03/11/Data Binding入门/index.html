@@ -1,0 +1,142 @@
+
+
+
+<!DOCTYPE html>
+<html lang="en,zh-CN,ja,default">
+<head>
+  <meta charset="UTF-8">
+  <title>Data Binding入门 [ hiaoyun-en ]</title>
+  
+  
+    <!-- stylesheets list from _config.yml -->
+    
+      <!-- 引入 CSS -->
+      <link rel="stylesheet" href="/css/noise.css">
+    
+      <!-- 引入 CSS -->
+      <link rel="stylesheet" href="/lib/fontawesome-free-5.11.2-web/css/all.css">
+    
+      <!-- 引入 CSS -->
+      <link rel="stylesheet" href="/lib/highlight/styles/atom-one-dark.css">
+    
+  
+<meta name="generator" content="Hexo 4.2.0"></head>
+<body>
+
+<!-- 引入导航菜单 -->
+ 
+<!-- 导航菜单 -->
+<div id="menu-outer">
+    <div id="menu-inner">
+        
+        <span id="menu-link-icon">
+            <a href="/">Home</a>
+        </span>
+        
+        <span id="menu-link-icon">
+            <a href="/archives">Archives</a>
+        </span>
+        
+        <span id="menu-link-icon">
+            <a href="/about">About</a>
+        </span>
+        
+    </div>
+</div>
+ 
+
+<div id="content-outer">
+  <div id="content-inner">
+     
+<article id="post">
+  <h1>Data Binding入门</h1>
+  <h2 id="启用-Data-Binding"><a href="#启用-Data-Binding" class="headerlink" title="启用 Data Binding"></a>启用 Data Binding</h2><p>Data Binding 库与 Android Gradle 插件捆绑在一起，所以不需要声明依赖，但需要启用。</p>
+<a id="more"></a>
+
+<p>在<code>module</code> 的<code>build.gradle</code>：</p>
+<pre><code class="groovy">android {
+        ...
+        dataBinding {
+            enabled = true
+        }
+    }</code></pre>
+<h2 id="转换-layout"><a href="#转换-layout" class="headerlink" title="转换 layout"></a>转换 layout</h2><p><code>&lt;data&gt;</code>标签将包含布局变量。</p>
+<pre><code class="xml">    &lt;data&gt;
+        &lt;variable name=&quot;name&quot; type=&quot;String&quot;/&gt;
+        &lt;variable name=&quot;lastName&quot; type=&quot;String&quot;/&gt;
+    &lt;/data&gt;</code></pre>
+<p>使用布局表达式：</p>
+<pre><code class="xml">   &lt;TextView
+                android:id=&quot;@+id/plain_name&quot;
+                android:text=&quot;@{name}&quot; 
+        ... /&gt;</code></pre>
+<h2 id="改变布局加载方式"><a href="#改变布局加载方式" class="headerlink" title="改变布局加载方式"></a>改变布局加载方式</h2><p>用了 Data Binding 后，就不用<code>setContentView()</code>来进行布局加载了。</p>
+<pre><code class="kotlin">val binding : PlainActivityBinding =
+    DataBindingUtil.setContentView(this, R.layout.plain_activity)</code></pre>
+<p>现在就可以设置变量的值了</p>
+<pre><code class="kotlin">binding.name = &quot;name&quot;
+binding.lastName = &quot;last name&quot;</code></pre>
+<h2 id="配合-ViewModel"><a href="#配合-ViewModel" class="headerlink" title="配合 ViewModel"></a>配合 ViewModel</h2><p>将变量集合在 <code>ViewModel</code>中，可以更加方便管理。需要初始化：</p>
+<pre><code class="kotlin">binding.viewmodel = viewModel</code></pre>
+<h2 id="处理事件"><a href="#处理事件" class="headerlink" title="处理事件"></a>处理事件</h2><p>Data Binding 库还可以处理用户事件和在布局变量上执行动作。</p>
+<pre><code class="xml">android:onClick=&quot;@{() -&gt; viewmodel.onLike()}&quot;</code></pre>
+<h2 id="配合-LiveData"><a href="#配合-LiveData" class="headerlink" title="配合 LiveData"></a>配合 LiveData</h2><p>Data Binding 配合 LiveData 可以使得数据在改变时自动使视图发生变化。</p>
+<p>需要初始化<code>lifecycleOwner</code>：</p>
+<pre><code class="kotlin">binding.lifecycleOwner = this</code></pre>
+<h2 id="使用-Binding-Adapter-创建自定义属性"><a href="#使用-Binding-Adapter-创建自定义属性" class="headerlink" title="使用 Binding Adapter 创建自定义属性"></a>使用 Binding Adapter 创建自定义属性</h2><pre><code class="kotlin">@BindingAdapter(&quot;app:hideIfZero&quot;)
+fun hideIfZero(view: View, number: Int) {
+    view.visibility = if (number == 0) View.GONE else View.VISIBLE
+}</code></pre>
+<p>使用：</p>
+<pre><code class="xml">    &lt;ProgressBar
+            android:id=&quot;@+id/progressBar&quot;
+            app:hideIfZero=&quot;@{viewmodel.likes}&quot;</code></pre>
+<h3 id="多参数的-Binding-Adapter"><a href="#多参数的-Binding-Adapter" class="headerlink" title="多参数的 Binding Adapter"></a>多参数的 Binding Adapter</h3><pre><code class="kotlin">@BindingAdapter(value = [&quot;app:progressScaled&quot;, &quot;android:max&quot;], requireAll = true)
+fun setProgress(progressBar: ProgressBar, likes: Int, max: Int) {
+    progressBar.progress = (likes * max / 5).coerceAtMost(max)
+}</code></pre>
+<p><code>requireAll</code>参数如果为<code>true</code>，则前面定义的<code>value</code>参数都要在<code>xml</code>中定义；如果为<code>false</code>，则缺少的属性为<code>null</code> <code>fasle</code> <code>0</code>。</p>
+<pre><code class="xml">        &lt;ProgressBar
+                android:id=&quot;@+id/progressBar&quot;
+                app:hideIfZero=&quot;@{viewmodel.likes}&quot;
+                app:progressScaled=&quot;@{viewmodel.likes}&quot;
+                android:max=&quot;@{100}&quot;
+...</code></pre>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://codelabs.developers.google.com/codelabs/android-databinding/" target="_blank" rel="noopener">Android Data Binding</a></p>
+<p>待</p>
+<p>2020-3-11 22:22:18</p>
+
+</article>
+
+<div id="paginator">
+  
+</div>
+
+  </div>
+</div>
+
+<div id="bottom-outer">
+    <div id="bottom-inner">
+        Site by Aoyun using
+        <a href="http://hexo.io" target="_blank" rel="noopener">hexo blog framework</a>.
+        <br>
+        <a href="/">Home</a>
+    </div>
+</div> 
+<button class="back-to-top">↑</button>
+
+<!-- 引入 JS -->
+<script src="https://ajax.aspnetcdn.com/ajax/jquery/jquery-1.9.0.min.js"></script>
+
+  <!-- scripts list from theme config.yml -->
+  
+    <script src="/js/noise.js"></script>
+  
+    <script src="/lib/highlight/highlight.pack.js"></script>
+  
+
+
+<script>hljs.initHighlightingOnLoad();</script>
+
+</body>
+</html>

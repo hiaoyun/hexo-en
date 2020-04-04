@@ -1,0 +1,174 @@
+
+
+
+<!DOCTYPE html>
+<html lang="en,zh-CN,ja,default">
+<head>
+  <meta charset="UTF-8">
+  <title>2-Java注解 [ hiaoyun-en ]</title>
+  
+  
+    <!-- stylesheets list from _config.yml -->
+    
+      <!-- 引入 CSS -->
+      <link rel="stylesheet" href="/css/noise.css">
+    
+      <!-- 引入 CSS -->
+      <link rel="stylesheet" href="/lib/fontawesome-free-5.11.2-web/css/all.css">
+    
+      <!-- 引入 CSS -->
+      <link rel="stylesheet" href="/lib/highlight/styles/atom-one-dark.css">
+    
+  
+<meta name="generator" content="Hexo 4.2.0"></head>
+<body>
+
+<!-- 引入导航菜单 -->
+ 
+<!-- 导航菜单 -->
+<div id="menu-outer">
+    <div id="menu-inner">
+        
+        <span id="menu-link-icon">
+            <a href="/">Home</a>
+        </span>
+        
+        <span id="menu-link-icon">
+            <a href="/archives">Archives</a>
+        </span>
+        
+        <span id="menu-link-icon">
+            <a href="/about">About</a>
+        </span>
+        
+    </div>
+</div>
+ 
+
+<div id="content-outer">
+  <div id="content-inner">
+     
+<article id="post">
+  <h1>2-Java注解</h1>
+  <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>注解在Java SE5中引入。注解好处多多，TA可以使我们的代码变得简洁，减少样板代码，还能存储有关程序的额外信息。程序员还可以自定义注解</p>
+<a id="more"></a>
+
+<pre><code class="java">// @Override为注解
+@Override
+public String toString() {
+    return &quot;ConferencePaper:&quot; + getTitle();
+}</code></pre>
+<h2 id="Java内置注解"><a href="#Java内置注解" class="headerlink" title="Java内置注解"></a>Java内置注解</h2><ul>
+<li><code>@Override</code> // 表示被注解的方法为重写的父类方法</li>
+<li><code>@Deprecated</code> // 表示被注解的元素已被废弃，不推荐使用</li>
+<li><code>@SuppressWarnings</code> // 压制不当的警告</li>
+</ul>
+<h2 id="元注解"><a href="#元注解" class="headerlink" title="元注解"></a>元注解</h2><p>用来自定义注解</p>
+<ul>
+<li><p><code>@Target</code></p>
+<p>  表示注解用于什么</p>
+<p>  可选参数（<code>ElementType</code>类型）：</p>
+<ul>
+<li><code>CONSTRUCTOR</code></li>
+<li><code>FIELD</code></li>
+<li><code>LOCAL_VARABLE</code></li>
+<li><code>METHOD</code></li>
+<li><code>PACKAGE</code></li>
+<li><code>PATAMETER</code></li>
+<li><code>TYPE</code></li>
+</ul>
+</li>
+<li><p><code>Retention</code></p>
+<p>  表示注解保存到什么级别</p>
+<p>  可选参数（<code>RetentionPolicy</code>类型）：</p>
+<ul>
+<li><code>SOURCE</code></li>
+<li><code>CLASS</code> // 在<code>.class</code>文件中可用，但运行时不会加载到虚拟机</li>
+<li><code>RUNTIME</code></li>
+</ul>
+</li>
+<li><p><code>Documented</code></p>
+<p>  将此注解包含在Javadoc中</p>
+</li>
+<li><p><code>Inherited</code></p>
+<p>  允许子类继承父类中的注解</p>
+</li>
+</ul>
+<h2 id="自定义注解"><a href="#自定义注解" class="headerlink" title="自定义注解"></a>自定义注解</h2><p>使用上面的元注解来自定义注解</p>
+<h3 id="标记注解"><a href="#标记注解" class="headerlink" title="标记注解"></a>标记注解</h3><pre><code class="java">// 自定义注解示例
+@Target(ElementType.METHOD)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface Test {
+}</code></pre>
+<p>使用<code>@interface</code>关键字来表明<code>Test</code>是一个注解，像这样的注解中没有任何元素的称为标记注解。</p>
+<h3 id="带元素的注解"><a href="#带元素的注解" class="headerlink" title="带元素的注解"></a>带元素的注解</h3><pre><code class="java">// 带元素的注解示例
+@Target(ElementType.METHOD)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface UseCase {
+    int id();
+    String description() default &quot;no description&quot;;
+}</code></pre>
+<p>使用时</p>
+<pre><code class="java">@UseCase(id = 19)
+public void checkId() {
+
+}
+
+@UseCase(id = 19, description = &quot;for checking name&quot;)
+public boolean checkName() {
+    return false;
+}
+
+@UseCase(description = &quot;for checking age&quot;, id = 20)
+public boolean checkAge() {
+    return false;
+}</code></pre>
+<p>如上所示，使用<code>id=19</code>这样传值，顺序任意。可见设置了<code>default</code>值的可省略传值，使用默认值。</p>
+<h3 id="注解元素"><a href="#注解元素" class="headerlink" title="注解元素"></a>注解元素</h3><ul>
+<li>所有基本类型（int,float,boolean,byte,double,char,long,short）</li>
+<li>String</li>
+<li>Class</li>
+<li>enum</li>
+<li>Annotation</li>
+<li>上述类型的数组</li>
+</ul>
+<h2 id="处理自定义注解"><a href="#处理自定义注解" class="headerlink" title="处理自定义注解"></a>处理自定义注解</h2><blockquote>
+<p>如果没有用来读取注解的工具，那注解也不会比注释更有用。</p>
+</blockquote>
+<p>处理注解就需要我们编写注解处理类，用到了<a href="https://aoyun.me/2019/10/13/1-Java反射/" target="_blank" rel="noopener">上一篇</a>文章讲到的反射</p>
+<p>2019-10-18 20:46:01</p>
+
+</article>
+
+<div id="paginator">
+  
+</div>
+
+  </div>
+</div>
+
+<div id="bottom-outer">
+    <div id="bottom-inner">
+        Site by Aoyun using
+        <a href="http://hexo.io" target="_blank" rel="noopener">hexo blog framework</a>.
+        <br>
+        <a href="/">Home</a>
+    </div>
+</div> 
+<button class="back-to-top">↑</button>
+
+<!-- 引入 JS -->
+<script src="https://ajax.aspnetcdn.com/ajax/jquery/jquery-1.9.0.min.js"></script>
+
+  <!-- scripts list from theme config.yml -->
+  
+    <script src="/js/noise.js"></script>
+  
+    <script src="/lib/highlight/highlight.pack.js"></script>
+  
+
+
+<script>hljs.initHighlightingOnLoad();</script>
+
+</body>
+</html>
